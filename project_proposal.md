@@ -49,12 +49,11 @@ There a few large risks for our project. One risk is that we we have to spend si
 
 ## This Project and Our Learning Goals
 
-**Sophia:**
------------
+### Sophia
 I think that this project fits in very well with my learning goals. I will have plenty of opportunities to try new tools/techniques in the project. Additionally, in the website that we make as a final deliverable for this project, there is plenty of potential to tell a coherent (and compelling, or at least, fun) story about what we learned by trying to make a bot using reinforcement learning. The one place that our project might not fit as clearly with my learning goal is with the scoping of the project. I’m aware that this project has the potential to never really be “done”, and as a result will take up as much time as I let it. To deal with this, we are planning on having a code freeze in the second to last week of the project, and shifting our focus to documenting and writing up the project, no matter where we are in the process of creating a bot. Additionally, since our goal is to learn about machine learning concepts, rather than to create a great bot, learning about these concepts will happen before we create a bot. This means that the part of the project that is pivotal to our goal happens earlier, rather than later, which means that failure to implement an advanced bot is not necessarily project failure. 
 
-**Mac-I:**
+### Mac-I
 My learning goals align quite nicely with this project. This project will allow me to improve my ability to estimate the length of time a task will take through practice. It will allow me to learn about a new algorithm. Lastly this project should allow me to focus on learning rather than producing deliverables since the goal of the project is not to present something that will change the world. 
 
-**Jacob:**
+### Jacob
 My learning goals align quite well with this project. Learning about a new machine learning model is a good fit because this will be pretty necessary for the project to succeed. This project is very model-focused which works well with my goal of doing mostly model-related things. We are all interested in managing time well, so having our project be learning-oriented rather than results-oriented lends itself well to being adjusted along the way.
