@@ -12,8 +12,7 @@ Our MVP is to create a bot that survives on a game board, where it is the only â
 
 Additionally, we are also planning on creating tools that allow us to play back games, and visualize performance of our bots, with the goal of creating a website that allows others to learn about what we learned about neural networks/genetic algorithms/reinforcement learning in a fun context. 
 
-To the best of your current knowledge, what datasets will you use for your project?  Are there any obstacles you foresee in terms of getting access to the data?
-
+## Dataset
 
 We do not have a dataset that we are working on. Since we are intending to use reinforcement learning, we will be generating our data as we go. The obstacles we foresee are related to handling the reinforcement learning rather than obtaining a dataset.
 
