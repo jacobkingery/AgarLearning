@@ -1,0 +1,3 @@
+[submodule "Ogar"]
+	path = Ogar
+	url = git@github.com:jacobkingery/Ogar.git
