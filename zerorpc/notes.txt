@@ -1,0 +1,8 @@
+Good:
+can basically call a function in python from node
+python process can be running side-by-side
+
+Bad:
+have to run python process side-by-side (maybe could spawn it from in node?)
+non-blocking (this is probably a good thing in the long run, but initially we may need to work around it)
+needs node version >=0.12.7 (I had to upgrade)

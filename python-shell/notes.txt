@@ -1,0 +1,5 @@
+Good:
+can send text or JSON data
+
+Bad:
+seems like you need to end the process for things to work properly; no continuous back-and-forth
