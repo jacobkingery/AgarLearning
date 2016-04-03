@@ -33,24 +33,264 @@ While in many kinds of supervised learning, the computer is trying to learn how 
 ## Some Basic Vocabuary
 Before we actually get in to talking about some reinforcement learning that we implemented ourselves, let's define some vocabulary and notation first!
 
-**State:** The state is everything the computer currently knows about what is happening in our game. In some cases, like Tic-Tac-Toe example we'll talk about later, this could be as simple as the current state of the board. 
+**State (s):** The state is everything the computer currently knows about what is happening in our game. In some cases, like Tic-Tac-Toe example we'll talk about later, this could be as simple as the current state of the board. 
 
-**Action:** Although this is fairly self-explanatory,an action is anything that a computer can do when the game is in a certain state. 
+**Action (a):** Although this is fairly self-explanatory,an action is anything that a computer can do when the game is in a certain state. 
 
-**Policy:** Our policy is a function that defines how the computer behaves at any given point in time. For simple cases, the input to this function is just the current state of the game. The output of the policy function in what the computer thinks is the action that should be performed next.
+**Policy (π):** Our policy is a function that defines how the computer behaves at any given point in time. For simple cases, the input to this function is just the current state of the game. The output of the policy function in what the computer thinks is the action that should be performed next.
 
-**Reward function:** The reward function tells the computer, that, given a certain state-action pair the reward for performing that action, given the current state. This reward is determined based on how desirable the result of performing a given action from a given state is.
+**Reward function:** The reward function tells the computer, that, given a certain state-action pair the reward for performing that action, given the current state. This reward is determined based on how desirable the result of performing a given action from a given state is. The reward of transitioning from state s to state s' given action a is normally written as r(s,a,s')
 
-**Value function:** Although some state, action pairs might have a good immediate outcome, they might not be as desirable in the long-term. The value function seeks to predict the long-term desirablitiy of a state action pair. 
+**Value function:** Although some state, action pairs might have a good immediate outcome, they might not be as desirable in the long-term. The value function seeks to predict the long-term desirablitiy of a state action pair. The predicted value of a given state under policy π, is written as v<sub>π</sub>(s), while the value of state s and taking action a is written as q<sub>π</sub>(s,a). 
 
 ## A Simple Example: Tic-Tac-Toe
-Now, let's extend this to implement our own reinforcement learning algorithm! We're going to be starting with a super simple case: Tic-Tac-Toe. (We found the example in the Sutton and Barto book about Tic-Tac-Toe particularly interesting and decided to implement it ourselves. The entire code for this can be found here: [Link](), but we'll walk through it step by step!
+Now, let's extend this to implement our own reinforcement learning algorithm! We're going to be starting with a super simple case: Tic-Tac-Toe. (We found the example in the Sutton and Barto book about Tic-Tac-Toe particularly interesting and decided to implement it ourselves. The entire code for this can be found here: [Link](), but we'll walk through it step by step! For this example, we'll be using an array (in some cases string) of nine characters to represet the tic-tac-toe board. In this array, the first three characters will represent the top row of the board, the second three the middle row, and the final three the bottom row of the board. 
+
+### Checking if a Gamestate is a Winning Gamestate
+The first thing we did was to check if a particular gamestate is a winning gamestate, with only one winner. To do this we defined the following function:
+
+``` python
+def isWinningGamestate(gamestate):
+  possibleWaysToWin = [
+    [0,1,2],
+    [3,4,5],
+    [6,7,8],
+    [0,3,6],
+    [1,4,7],
+    [2,5,8],
+    [0,4,8],
+    [6,4,2],
+  ]
+  numWinners = 0
+  winner = ''
+  for poss in possibleWaysToWin:
+    if ((gamestate[poss[0]] != '_') and
+      (gamestate[poss[0]] == gamestate[poss[1]]) and 
+      (gamestate[poss[1]] == gamestate[poss[2]])):
+      numWinners+= 1
+      winner = gamestate[poss[0]]
+  
+  return (numWinners, winner)
+```
+
+In this function, we loop over all the possible ways that someone could win and check to see if someone has won in that way. For every winner, we increment the number of winners by 1 (so that we can check to make sure that if there is a winner, there is and only one, winner if there is a winner.)
+
+### Getting all possible next moves
+Next, we wrote a function, that given a gamestate and a player whose turn it was, returned a list of all possible next game states.
+
+```python
+def getNextGameStates (gameState, player):
+  blankSpots = [i for i,slot in enumerate(gameState) if slot=='_']
+  
+  nextStates = []
+  for blankSpot in blankSpots:
+    tempNextState = copy(gameState)
+    tempNextState[blankSpot] = player
+    nextStates.append(tempNextState)
+  
+  return nextStates
+```
+
+In this function, we are finding the indices of all the blank spots, and for each one, we put the player's piece in that spot. We return the list of all states where it would be possible to move, given the current state.
+
+### Intializing our reward Function
+Next, we implemented a reward function. In this case, we're implementing what is basically a lookup-table for different game states and their rewards. The code for this is below:
+
+``` python
+def createGameStateTable (player):
+  allStates = list(itertools.product(['X','O','_'], repeat =9))
+  gameStateTable = {}
+  for state in allStates:
+    stateStr = ''.join(state)
+    
+    Xcount = state.count('X')
+    Ocount = state.count('O')     
+    
+    if ((Xcount == Ocount) or ((Xcount - 1) == Ocount)):
+      numWinners,winner = isWinningGamestate(state)
+      if (numWinners == 0):
+        blankCount = state.count('_')
+        if (blankCount == 0):
+          gameStateTable[stateStr] = 0
+        else:
+          gameStateTable[stateStr] = 0.5
+      elif (numWinners == 1):
+        gameStateTable[stateStr] = int(winner==player)
+  return gameStateTable
+```
+
+First, we create a list of all possible combinations of Xs Os and blanks. Then, for each of the possible combinations, we count the number of Xs and Os. If the number is equal or there is one more X than 0, we know that this is likely a legal game state (assuming that there is no more than one winner.) Then, we get whether or not there is a winner for our game state. If there is none, we assign the reward to be 0.5. If there is one winner and the computer (X's) is the winner the reward is set to 1. If the gamestate depicts a draw or O's winning, then we set the reward to zero. 
+
+### Playing a game. 
+Now, using this rewards table, we're going to play a round of tic-tac-toe. **Note:** This is also where we implement our policy and value functions. The code we used to play one game of tic-tac-toe is below:
+
+```python
+#Initialize the board
+board = ['_']*9
+Players = ['O','X']
+playerTurn = 0
+statesDict = createGameStateTable('X')
+numWinners, winner = isWinningGamestate(board)
+
+#keeping track variables for the learner
+lastLearningBoard = ''.join(['_']*9)
+adjustWeightFactor = 0.5
+
+
+
+while (numWinners == 0):
+  print board
+  # O's Turn... Move Randomly
+  if (playerTurn == 1):
+    playerTurn = 0
+    blankSpots = [i for i,slot in enumerate(board) if slot=='_']
+    
+    placeToMove = random.choice(blankSpots)
+    board[placeToMove] = 'O'
+     
+  else:
+    playerTurn = 1
+    #Get all the next possible game states
+    possStates = getNextGameStates(board, 'X')
+    possWinning = []
+    #Get the possibilities of winning for the next state
+    for possState in possStates:
+        stateStr = ''.join(possState)
+        possWinning.append(statesDict[stateStr])
+        
+    #Get the best move(s) by our probability of winning
+    maxReward = max(possWinning)
+    bestMoves = []
+    otherMoves = []
+    for k,possWin in enumerate(possWinning):
+      if (possWin == maxReward):
+        bestMoves.append(possStates[k])
+      else:
+        otherMoves.append(possStates[k])
+     
+    isExploratory = 0
+    
+    if (len(otherMoves) > 0):
+      #Are we being exploratory?
+      isExploratory = random.random() > 0.8
+    
+    if (isExploratory):
+      #Exploratory behavior
+      board = list(random.choice(otherMoves))
+        
+    else:
+      board = list(random.choice(bestMoves))
+        
+      oldProbW = statesDict[lastLearningBoard]
+      newProbW = statesDict[''.join(board)]
+      statesDict[lastLearningBoard] += adjustWeightFactor*(newProbW - oldProbW)
+      print lastLearningBoard, statesDict[lastLearningBoard]
+            
+      lastLearningBoard = ''.join(board)
+ 
+   
+  numWinners, winner = isWinningGamestate(board)
+    
+print board  
+print "winner", winner
+
+```
+Since this is quite a bit of code, we'll walk through it bit by bit. First, we intitalize the board:
+```python
+#Initialize the board
+board = ['_']*9
+Players = ['O','X']
+playerTurn = 0
+statesDict = createGameStateTable('X')
+numWinners, winner = isWinningGamestate(board)
+
+#keeping track variables for the learner
+lastLearningBoard = ''.join(['_']*9)
+adjustWeightFactor = 0.5
+```
+
+As we initialize the board, we set up a blank board, declare who the players are, set up whose turn it is. Additionally, we create a brand new game state table (our rewards function). Finally we check whether there's a winner (there won't be). Additionally, we also keep track of the last learning board, and how much we want to adjust the reward by when we update it. This will be a part of our value function, so stay tuned for that!
+
+Next, we move into the main game loop. If it's O's turn we move randomly:
+
+```python
+if (playerTurn == 1):
+  playerTurn = 0
+  blankSpots = [i for i,slot in enumerate(board) if slot=='_']
+  
+  placeToMove = random.choice(blankSpots)
+  board[placeToMove] = 'O'
+```
+Here, we're just finding all the empty spots, and picking a random one to place an "O" in. Then, it's the computer's turn!
+
+First, we get all the possible game states and get the reward for each out of the reward table we initialized earlier (**Note:** this is were our policy function is implemented):
+
+```python
+playerTurn = 1
+  #Get all the next possible game states
+  possStates = getNextGameStates(board, 'X')
+  possWinning = []
+  #Get the possibilities of winning for the next state
+  for possState in possStates:
+    stateStr = ''.join(possState)
+    possWinning.append(statesDict[stateStr])
+```
+
+Next, we want to find the best move possible, so we split up the our next possible states ```possStates``` into two lists: one list contains all the moves that had the highest reward, and the other list contains all of the other moves. These lists are called ```bestMoves``` and ```otherMoves```, respectively:
+
+```python
+#Get the best move(s) by our probability of winning
+maxReward = max(possWinning)
+bestMoves = []
+otherMoves = []
+for k,possWin in enumerate(possWinning):
+  if (possWin == maxReward):
+    bestMoves.append(possStates[k])
+  else:
+    otherMoves.append(possStates[k])
+```
+
+Next, we actually decide what our action is going to be. Most of the time, we'll make the best move possible, but 20 percent of the time, we'll randomly select another move, that doesn't have as high of a reward. We'll only be exploratory, though, when all of the moves that we could possibly make don't have the same weight. 
+
+```python
+isExploratory = 0
+        
+if (len(otherMoves) > 0):
+  #Are we being exploratory?
+  isExploratory = random.random() > 0.8
+
+if (isExploratory):
+  #Exploratory behavior
+  board = list(random.choice(otherMoves))
+    
+else:
+  board = list(random.choice(bestMoves))
+  
+  oldProbW = statesDict[lastLearningBoard]
+  newProbW = statesDict[''.join(board)]
+  statesDict[lastLearningBoard] += adjustWeightFactor*(newProbW - oldProbW)
+  print lastLearningBoard, statesDict[lastLearningBoard]
+          
+  lastLearningBoard = ''.join(board)
+```
+
+Here, we first check whether or not we can be exploratory. Then, if we are, we randomly chose a move from the ```otherMoves``` list. If we aren't being exploratory, we randomly choose a move from the ```bestMoves``` list. The reason we randomly choose a move from this list is that they are all equally "good" according to our reward function. We explore more of the possible states if we randomly choose among the best moves than if we just always pick the first one. If we weren't exploratory, we go back and update the reward of our previous move to be closer to the reward of the move that we just made. We use the ```adjustWeightFactor``` to tell us how close we should make the two moves. (***Note:*** this back-propogation is our value function.)
+
+### Playing a lot of Games
+The computer doesn't learn how to play tic-tac-toe in just one game; it takes a lot of games before the computer can play well. As a result, we had our computer play 100,000 games of tic-tac-toe against a "dumb", or randomly moving opponent. We then plotted the cumulative percentage of winning, losing, and drawing over each of these games. This plot can be seen below:
+
+![Cumulative winning losing and draw percentages over the number of games played](images/ComputerPerformance.png "Well, we did get better at playing tic-tac-toe...")
+
+One question we intitaliy asked ourselves with this picture is why the losing percentage does not go to 0 over time. We think that this is potentially for two reasons:
+
+1. With a normal reinforcement learning algorithm, you would lower the chance of taking an exploratory move over time.
+2. Similaraly, you would also probably lower the weight that you use to adjust, or back-propogate the reward onto a previous state. 
+
+That being said, we feel like we did learn a lot from the general process of implementing this reinforcement learning algorithm. 
 
 ## Extending this to the Agar Case
-
-
+Although the tic-tac-toe reinforcement learning algorithm was great in that it allowed us to learn about reinforcement learning, there are some major differences that do not allow us to easily transfer the code we wrote for the tic-tac-toe example, into the case of building an agar.io bot. The first of these is the fact that there are a finite number of states in the tic-tac-toe case, while the agar.io world is continuous, so we will have to generalize between states. As a result, the impementation of this will be a little bit harder. We are currently trying to figure out how we will represet the state of the game to the computer, so stay tuned for our next blog post!
  
-
 ## Resources
 The resource we've used the most so far has been "Reinforcement Learning: An Introduction", by Richard Sutton and Andrew Barto. [Link here!](https://webdocs.cs.ualberta.ca/~sutton/book/the-book.html)
 
