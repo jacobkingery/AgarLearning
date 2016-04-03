@@ -1,21 +1,60 @@
 <!DOCTYPE html>
 <html>
-<title>Hello Strapdown</title>
+<head>
+    <meta charset="UTF-8">
+<!--     <title>Agarlearning by jacobkingery</title>
+ -->    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+</head>
+<body>
+  	<section class="page-header">
+      <h1 class="project-name">Agarlearning</h1>
+      <h2 class="project-tagline"></h2>
+      <a href="https://github.com/jacobkingery/AgarLearning" class="btn">View on GitHub</a>
+      <a href="index.html" class="btn">Home Page</a>
+      <a href="projectProposal.html" class="btn">Project Proposal</a>
+      <a href="blogPost1.html" class="btn">Blog Post 1</a>
+    </section>
 
-<xmp theme="united" style="display:none;">
-# Markdown text goes in here
+<!-- <title>Project Proposal</title>
+ -->
+<xmp  style="display:none;">
+# Learning About Reinforcement Learning
+**Jacob, Mac-I, and Sophia**
 
-## Chapter 1
+Hi Everyone, we're working on building an [agar.io](http://agar.io/) bot using reinforcement learning and neural networks. (For more information about this prject, please check out our [project proposal](projectProposal.html)!). Since none of us have any experience with reinforcement learning or neural networks, we've been learning a ton about them! This blog post will focus mostly on what we've learned about reinforcement learning, but we'll talk about neural networks and how we think they'll fit into our project a little bit at the end. Most of this blog post was drawn from reading we did in "Reinforcement Learning: An Introduction", by Richard Sutton and Andrew Barto. [Link here!](https://webdocs.cs.ualberta.ca/~sutton/book/the-book.html).
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore
-et dolore magna aliqua. 
+## The Idea Behind Reinforcement Learning
+While in many kinds of supervised learning, the computer is trying to learn how to predict outputs from inputs given an already-collected set of sample inputs and outputs, this is not what happens in reinforcement learning. In reinforcement learning, however, the computer tries to predict an outcome, or what to do, by trying various actions, and seeing the outcome. In other words, in reinforcement learning, a computer teaches itself how to do something by trying out various actions and seeing how well they worked. This makes reinforcement learning particuarly well-suited to teaching computers how to play a game. 
 
-## Chapter 2
+## Some Basic Vocabuary
+Before we actually get in to talking about some reinforcement learning that we implemented ourselves, let's define some vocabulary and notation first!
 
-Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-culpa qui officia deserunt mollit anim id est laborum.
+**State:** The state is everything the computer currently knows about what is happening in our game. In some cases, like Tic-Tac-Toe example we'll talk about later, this could be as simple as the current state of the board. 
+
+**Action:** Although this is fairly self-explanatory,an action is anything that a computer can do when the game is in a certain state. 
+
+**Policy:** Our policy is a function that defines how the computer behaves at any given point in time. For simple cases, the input to this function is just the current state of the game. The output of the policy function in what the computer thinks is the action that should be performed next.
+
+**Reward function:** The reward function tells the computer, that, given a certain state-action pair the reward for performing that action, given the current state. This reward is determined based on how desirable the result of performing a given action from a given state is.
+
+**Value function:** Although some state, action pairs might have a good immediate outcome, they might not be as desirable in the long-term. The value function seeks to predict the long-term desirablitiy of a state action pair. 
+
+## A Simple Example: Tic-Tac-Toe
+Now, let's extend this to implement our own reinforcement learning algorithm! We're going to be starting with a super simple case: Tic-Tac-Toe. (We found the example in the Sutton and Barto book about Tic-Tac-Toe particularly interesting and decided to implement it ourselves. The entire code for this can be found here: [Link](), but we'll walk through it step by step!
+
+## Extending this to the Agar Case
+
+
+ 
+
+## Resources
+The resource we've used the most so far has been "Reinforcement Learning: An Introduction", by Richard Sutton and Andrew Barto. [Link here!](https://webdocs.cs.ualberta.ca/~sutton/book/the-book.html)
+
+
 </xmp>
 
 <script src="http://strapdownjs.com/v/0.2/strapdown.js"></script>
