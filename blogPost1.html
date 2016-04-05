@@ -25,12 +25,12 @@
 # Learning About Reinforcement Learning
 **Jacob, Mac-I, and Sophia**
 
-Hi Everyone, we're working on building an [agar.io](http://agar.io/) bot using reinforcement learning and neural networks. (For more information about this prject, please check out our [project proposal](projectProposal.html)!). Since none of us have any experience with reinforcement learning or neural networks, we've been learning a ton about them! This blog post will focus mostly on what we've learned about reinforcement learning, but we'll talk about neural networks and how we think they'll fit into our project a little bit at the end. Most of this blog post was drawn from reading we did in "Reinforcement Learning: An Introduction", by Richard Sutton and Andrew Barto. [Link here!](https://webdocs.cs.ualberta.ca/~sutton/book/the-book.html). First, we'll talk a little bit about reinforcement learning, then we'll talk about a *very* simple example we implemented, and then we'll talk about how this extends to our project of building an agar bot. 
+Hi everyone, we're working on building an [agar.io](http://agar.io/) bot using reinforcement learning and neural networks. (For more information about this project, please check out our [project proposal](projectProposal.html)!). Since none of us have any experience with reinforcement learning or neural networks, we've been learning a ton about them! This blog post will focus mostly on what we've learned about reinforcement learning, but we'll talk about neural networks and how we think they'll fit into our project a little bit at the end. Most of this blog post was drawn from reading we did in "Reinforcement Learning: An Introduction", by Richard Sutton and Andrew Barto. [Link here!](https://webdocs.cs.ualberta.ca/~sutton/book/the-book.html) First, we'll talk a little bit about reinforcement learning, then we'll talk about a *very* simple example we implemented, and then we'll talk about how this extends to our project of building an agar bot. 
 
 ## The Idea Behind Reinforcement Learning
-While in many kinds of supervised learning, the computer is trying to learn how to predict outputs from inputs given an already-collected set of sample inputs and outputs, this is not what happens in reinforcement learning. In reinforcement learning, however, the computer tries to predict an outcome, or what to do, by trying various actions, and seeing the outcome. In other words, in reinforcement learning, a computer teaches itself how to do something by trying out various actions and seeing how well they worked. This makes reinforcement learning particuarly well-suited to teaching computers how to play a game. 
+While in many kinds of supervised learning, the computer is trying to learn how to predict outputs from inputs given an already-collected set of sample inputs and outputs, this is not what happens in reinforcement learning. In reinforcement learning, however, the computer tries to predict an outcome, or what to do, by trying various actions, and seeing the outcome. In other words, in reinforcement learning, a computer teaches itself how to do something by trying out various actions and seeing how well they worked. This makes reinforcement learning particularly well-suited to teaching computers how to play a game. 
 
-## Some Basic Vocabuary
+## Some Basic Vocabulary
 Before we actually get in to talking about some reinforcement learning that we implemented ourselves, let's define some vocabulary and notation first!
 
 **State (s):** The state is everything the computer currently knows about what is happening in our game. In some cases, like Tic-Tac-Toe example we'll talk about later, this could be as simple as the current state of the board. 
@@ -41,10 +41,10 @@ Before we actually get in to talking about some reinforcement learning that we i
 
 **Reward function:** The reward function tells the computer, that, given a certain state-action pair the reward for performing that action, given the current state. This reward is determined based on how desirable the result of performing a given action from a given state is. The reward of transitioning from state s to state s' given action a is normally written as r(s,a,s')
 
-**Value function:** Although some state, action pairs might have a good immediate outcome, they might not be as desirable in the long-term. The value function seeks to predict the long-term desirablitiy of a state action pair. The predicted value of a given state under policy π, is written as v<sub>π</sub>(s), while the value of state s and taking action a is written as q<sub>π</sub>(s,a). 
+**Value function:** Although some state, action pairs might have a good immediate outcome, they might not be as desirable in the long-term. The value function seeks to predict the long-term desirability of a state action pair. The predicted value of a given state under policy π, is written as v<sub>π</sub>(s), while the value of state s and taking action a is written as q<sub>π</sub>(s,a). 
 
 ## A Simple Example: Tic-Tac-Toe
-Now, let's extend this to implement our own reinforcement learning algorithm! We're going to be starting with a super simple case: Tic-Tac-Toe. (We found the example in the Sutton and Barto book about Tic-Tac-Toe particularly interesting and decided to implement it ourselves. The entire code for this can be found here: [Link](https://github.com/jacobkingery/AgarLearning/blob/master/ReinforcementLearningExamples/Tic%20Tac%20Toe%20Exploration.ipynb), but we'll walk through it step by step! For this example, we'll be using an array (in some cases string) of nine characters to represet the tic-tac-toe board. In this array, the first three characters will represent the top row of the board, the second three the middle row, and the final three the bottom row of the board. 
+Now, let's extend this to implement our own reinforcement learning algorithm! We're going to be starting with a super simple case: Tic-Tac-Toe. (We found the example in the Sutton and Barto book about Tic-Tac-Toe particularly interesting and decided to implement it ourselves. The entire code for this can be found here: [Link](https://github.com/jacobkingery/AgarLearning/blob/master/ReinforcementLearningExamples/Tic%20Tac%20Toe%20Exploration.ipynb), but we'll walk through it step by step! For this example, we'll be using an array (in some cases string) of nine characters to represent the tic-tac-toe board. In this array, the first three characters will represent the top row of the board, the second three the middle row, and the final three the bottom row of the board. 
 
 ### Checking if a Gamestate is a Winning Gamestate
 The first thing we did was to check if a particular gamestate is a winning gamestate, with only one winner. To do this we defined the following function:
@@ -73,7 +73,7 @@ def isWinningGamestate(gamestate):
   return (numWinners, winner)
 ```
 
-In this function, we loop over all the possible ways that someone could win and check to see if someone has won in that way. For every winner, we increment the number of winners by 1 (so that we can check to make sure that if there is a winner, there is and only one, winner if there is a winner.)
+In this function, we loop over all the possible ways that someone could win and check to see if someone has won in that way. For every winning combination, we increment the number of winners by 1 (so that we can check to make sure that if there is a winner, there is only one).
 
 ### Getting all possible next moves
 Next, we wrote a function, that given a gamestate and a player whose turn it was, returned a list of all possible next game states.
@@ -93,7 +93,7 @@ def getNextGameStates (gameState, player):
 
 In this function, we are finding the indices of all the blank spots, and for each one, we put the player's piece in that spot. We return the list of all states where it would be possible to move, given the current state.
 
-### Intializing our reward Function
+### Initializing our reward Function
 Next, we implemented a reward function. In this case, we're implementing what is basically a lookup-table for different game states and their rewards. The code for this is below:
 
 ``` python
@@ -119,7 +119,7 @@ def createGameStateTable (player):
   return gameStateTable
 ```
 
-First, we create a list of all possible combinations of Xs Os and blanks. Then, for each of the possible combinations, we count the number of Xs and Os. If the number is equal or there is one more X than 0, we know that this is likely a legal game state (assuming that there is no more than one winner.) Then, we get whether or not there is a winner for our game state. If there is none, we assign the reward to be 0.5. If there is one winner and the computer (X's) is the winner the reward is set to 1. If the gamestate depicts a draw or O's winning, then we set the reward to zero. 
+First, we create a list of all possible combinations of Xs, Os, and blanks. Then, for each of the possible combinations, we count the number of Xs and Os. If the number is equal or there is one more X than 0, we know that this is likely a legal game state (assuming that there is no more than one winner.) Then, we get whether or not there is a winner for our game state. If there is none, we assign the reward to be 0.5. If there is one winner and the computer (X's) is the winner the reward is set to 1. If the gamestate depicts a draw or O's winning, then we set the reward to zero. 
 
 ### Playing a game. 
 Now, using this rewards table, we're going to play a round of tic-tac-toe. **Note:** This is also where we implement our policy and value functions. The code we used to play one game of tic-tac-toe is below:
@@ -195,7 +195,7 @@ print board
 print "winner", winner
 
 ```
-Since this is quite a bit of code, we'll walk through it bit by bit. First, we intitalize the board:
+Since this is quite a bit of code, we'll walk through it bit by bit. First, we initialize the board:
 ```python
 #Initialize the board
 board = ['_']*9
@@ -274,26 +274,25 @@ else:
   lastLearningBoard = ''.join(board)
 ```
 
-Here, we first check whether or not we can be exploratory. Then, if we are, we randomly chose a move from the ```otherMoves``` list. If we aren't being exploratory, we randomly choose a move from the ```bestMoves``` list. The reason we randomly choose a move from this list is that they are all equally "good" according to our reward function. We explore more of the possible states if we randomly choose among the best moves than if we just always pick the first one. If we weren't exploratory, we go back and update the reward of our previous move to be closer to the reward of the move that we just made. We use the ```adjustWeightFactor``` to tell us how close we should make the two moves. (***Note:*** this back-propogation is our value function.)
+Here, we first check whether or not we can be exploratory. Then, if we are, we randomly chose a move from the ```otherMoves``` list. If we aren't being exploratory, we randomly choose a move from the ```bestMoves``` list. The reason we randomly choose a move from this list is that they are all equally "good" according to our reward function. We explore more of the possible states if we randomly choose among the best moves than if we just always pick the first one. If we weren't exploratory, we go back and update the reward of our previous move to be closer to the reward of the move that we just made. We use the ```adjustWeightFactor``` to tell us how close we should make the two moves. (***Note:*** this back-propagation is our value function.)
 
 ### Playing a lot of Games
 The computer doesn't learn how to play tic-tac-toe in just one game; it takes a lot of games before the computer can play well. As a result, we had our computer play 100,000 games of tic-tac-toe against a "dumb", or randomly moving opponent. We then plotted the cumulative percentage of winning, losing, and drawing over each of these games. This plot can be seen below:
 
 ![Cumulative winning losing and draw percentages over the number of games played](images/ComputerPerformance.png "Well, we did get better at playing tic-tac-toe...")
 
-One question we intitaliy asked ourselves with this picture is why the losing percentage does not go to 0 over time. We think that this is potentially for two reasons:
+One question we initially asked ourselves with this picture is why the losing percentage does not go to 0 over time. We think that this is potentially for two reasons:
 
 1. With a normal reinforcement learning algorithm, you would lower the chance of taking an exploratory move over time.
-2. Similaraly, you would also probably lower the weight that you use to adjust, or back-propogate the reward onto a previous state. 
+2. Similarly, you would also probably lower the weight that you use to adjust, or back-propagate the reward onto a previous state. 
 
 That being said, we feel like we did learn a lot from the general process of implementing this reinforcement learning algorithm. 
 
 ## Extending this to the Agar Case
-Although the tic-tac-toe reinforcement learning algorithm was great in that it allowed us to learn about reinforcement learning, there are some major differences that do not allow us to easily transfer the code we wrote for the tic-tac-toe example, into the case of building an agar.io bot. The first of these is the fact that there are a finite number of states in the tic-tac-toe case, while the agar.io world is continuous, so we will have to generalize between states. As a result, the impementation of this will be a little bit harder. We are currently trying to figure out how we will represet the state of the game to the computer, so stay tuned for our next blog post!
+Although the tic-tac-toe reinforcement learning algorithm was great in that it allowed us to learn about reinforcement learning, there are some major differences that do not allow us to easily transfer the code we wrote for the tic-tac-toe example, into the case of building an agar.io bot. The first of these is the fact that there are a finite number of states in the tic-tac-toe case, while the agar.io world is continuous, so we will have to generalize between states. As a result, the implementation of this will be a little bit harder. We are currently trying to figure out how we will represent the state of the game to the computer, so stay tuned for our next blog post!
  
 ## Resources
-The resource we've used the most so far has been "Reinforcement Learning: An Introduction", by Richard Sutton and Andrew Barto. [Link here!](https://webdocs.cs.ualberta.ca/~sutton/book/the-book.html)
-
+The resource we've used the most so far has been "Reinforcement Learning: An Introduction," by Richard Sutton and Andrew Barto. [Link here!](https://webdocs.cs.ualberta.ca/~sutton/book/the-book.html)
 
 </xmp>
 
