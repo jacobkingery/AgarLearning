@@ -22,7 +22,7 @@ class ReinforcementQLearning:
 			return self.getBestActionValuePair(state)[0]
 
 	def getBestActionValuePair(self, state):
-		actionValuePairs = self.neuralNet.getValues(state, self.actions) #expects a list of tuples: [(action, value),(action, value),(action, value)]
+		actionValuePairs = self.neuralNet.getValuesForActions(state, self.actions) #expects a list of tuples: [(action, value),(action, value),(action, value)]
 		bestActionValuePair = max(actionValuePairs, key=lambda pair: pair[1])
 		return bestActionValuePair
 
@@ -53,7 +53,7 @@ class ReinforcementQLearning:
 
 if __name__ == "__main__":
 	class DumbNeuralNet:
-		def getValues(self, state, actions):
+		def getValuesForActions(self, state, actions):
 			actionValueList = []
 			for action in actions:
 				actionValueList.append((action, random.random()))

@@ -156,6 +156,21 @@ class NeuralNet(object):
             self.observation: state
         })[0]
 
+    def getValuesForActions(self, state, actions):
+        """
+        Inputs state and actions into NN and returns resulting value for each action
+        Inputs:
+            state - flattened numpy array representing current state
+            actions - list of actions
+        Outputs:
+            numpy array of scores for each action
+        """
+        actionValuePairs = []
+        for i, action in enumerate(actions):
+            value = self.getValues(state + [action])
+            actionValuePairs.append((action,value))
+        return actionValuePairs
+
 
 if __name__ == '__main__':
     layers = [
