@@ -84,26 +84,20 @@ class NeuralNet(object):
     """
     Overall class containing our NN
     """
-    def __init__(self, layers, optimizer, seeds=None, discountRate=0.95, targetNetUpdateRate=0.01):
+    def __init__(self, layers, optimizer=None, seeds=None):
         """
         Initializes NN container
         Inputs:
-            layers       - list of tuples containing the number of nodes and
-                           activation function for each layer; see MLP for example
-            optimizer    - optimizer for prediction error; e.g.
-                           tf.train.RMSPropOptimizer(learning_rate=0.001, decay=0.9)
-            seeds        - list of integer seeds for layer random initializations,
-                           must be of length len(layers)-1; default [0,1,...,N]
-            discountRate - discount rate for predicting future rewards;
-                           default 0.95
-            targetNetUpdateRate - update rate for target net; default 0.01
+            layers    - list of tuples containing the number of nodes and
+                        activation function for each layer; see MLP for example
+            optimizer - optimizer for prediction error; default
+                        tf.train.RMSPropOptimizer(learning_rate=0.001, decay=0.9)
+            seeds     - list of integer seeds for layer random initializations,
+                        must be of length len(layers)-1; default [0,1,...,N]
         """
+        optimizer = optimizer or tf.train.RMSPropOptimizer(learning_rate=0.001, decay=0.9)
         seeds = seeds or range(len(layers) - 1)
-        self.neuralNet = MLP(layers, seeds, 'neuralNet')
-        self.targetNet = MLP(layers, seeds, 'targetNet')
-
-        discountRate = tf.constant(discountRate)
-        targetNetUpdateRate = tf.constant(targetNetUpdateRate)
+        self.neuralNet = MLP(layers, seeds)
 
         # self.session = tf.InteractiveSession()
         self.session = tf.Session()
@@ -111,76 +105,44 @@ class NeuralNet(object):
         self.stateSize = layers[0][0]
         self.numActions = layers[-1][0]
 
-        # for action predictions
-        with tf.name_scope('action'):
-            self.observation  = tf.placeholder(tf.float32, (None, self.stateSize))
-            self.actionScores = self.neuralNet(self.observation)
+        self.observation  = tf.placeholder(tf.float32, (None, self.stateSize))
+        self.actionScores = self.neuralNet(self.observation)
 
-        # for target future reward predictions
-        with tf.name_scope('target'):
-            self.nextObservation  = tf.placeholder(tf.float32, (None, self.stateSize))
-            self.nextObservationMask = tf.placeholder(tf.float32, (None,))
-            self.nextActionScores = tf.stop_gradient(self.targetNet(self.nextObservation))
-            self.rewards  = tf.placeholder(tf.float32, (None,))
-            targetValues = tf.reduce_max(self.nextActionScores, reduction_indices=[1,]) * self.nextObservationMask
-            self.futureRewards = self.rewards + discountRate * targetValues
-
-        # for prediction errors
-        with tf.name_scope('error'):
-            self.actionMask = tf.placeholder(tf.float32, (None, self.numActions))
-            self.maskedActionScores = tf.reduce_sum(self.actionScores * self.actionMask, reduction_indices=[1,])
-            self.predictionError = tf.reduce_mean(tf.square(self.maskedActionScores - self.futureRewards))
-            gradients = optimizer.compute_gradients(self.predictionError)
-            for i, (grad, var) in enumerate(gradients):
-                if grad is not None:
-                    gradients[i] = (tf.clip_by_norm(grad, 5), var)
-            self.trainOp = optimizer.apply_gradients(gradients)
-
-        # for target net updates
-        with tf.name_scope('update'):
-            self.targetNetUpdate = []
-            for vSource, vTarget in zip(self.neuralNet.variables(), self.targetNet.variables()):
-                # this is equivalent to target = (1-alpha) * target + alpha * source
-                self.targetNetUpdate.append(
-                    vTarget.assign_sub(targetNetUpdateRate * (vTarget - vSource))
-                )
-            self.targetNetUpdate = tf.group(*self.targetNetUpdate)
+        self.actionMask = tf.placeholder(tf.float32, (None, self.numActions))
+        self.values = tf.placeholder(tf.float32, (None,))
+        self.maskedActionScores = tf.reduce_sum(self.actionScores * self.actionMask, reduction_indices=[1,])
+        self.predictionError = tf.reduce_mean(tf.square(self.maskedActionScores - self.values))
+        gradients = optimizer.compute_gradients(self.predictionError)
+        # for i, (grad, var) in enumerate(gradients):
+        #     if grad is not None:
+        #         gradients[i] = (tf.clip_by_norm(grad, 5), var)
+        self.trainOp = optimizer.apply_gradients(gradients)
 
         self.session.run(tf.initialize_all_variables())
-        self.session.run(self.targetNetUpdate)
 
-    def train(self, SARS):
+    def train(self, SAVs):
         """
         Updates NN with given information
         Inputs:
-            SARS - list of tuples of (state, action, reward, newState)
+            SAVs - list of tuples of (state, action, value)
         """
-        states = np.empty((len(SARS), self.stateSize))
-        actionMask = np.zeros((len(SARS), self.numActions))
-        rewards = np.empty((len(SARS),))
-        newStates = np.zeros((len(SARS), self.stateSize))
-        newStatesMask = np.zeros((len(SARS),))
+        states = np.empty((len(SAVs), self.stateSize))
+        actionMask = np.zeros((len(SAVs), self.numActions))
+        values = np.empty((len(SAVs),))
 
-        for i, (state, action, reward, newState) in enumerate(SARS):
+        for i, (state, action, value) in enumerate(SAVs):
             states[i] = state
             actionMask[i][action] = 1
-            rewards[i] = reward
-            if newState is not None:
-                newStates[i] = newState
-                newStatesMask[i] = 1
+            values[i] = value
 
         self.session.run([
             self.predictionError,
             self.trainOp
         ], {
             self.observation: states,
-            self.nextObservation: newStates,
-            self.nextObservationMask: newStatesMask,
             self.actionMask: actionMask,
-            self.rewards: rewards
+            self.values: values
         })
-
-        self.session.run(self.targetNetUpdate)
 
     def getValues(self, state):
         """
@@ -202,8 +164,7 @@ if __name__ == '__main__':
         (6,tf.tanh),
         (4,tf.identity) # output
     ]
-    optimizer = tf.train.RMSPropOptimizer(learning_rate=0.001, decay=0.9)
-    nn = NeuralNet(layers, optimizer)
+    nn = NeuralNet(layers)
 
     state = np.array([
         [2,1,0],
@@ -219,7 +180,7 @@ if __name__ == '__main__':
         [0,1,0],
         [0,0,0]
     ]).flatten()[np.newaxis,:]
-    nn.train([(state, action, reward, newState)])
+    nn.train([(state, action, reward)])
 
     state = newState
     print nn.getValues(state)
@@ -231,7 +192,7 @@ if __name__ == '__main__':
         [0,1,0],
         [0,0,0]
     ]).flatten()[np.newaxis,:]
-    nn.train([(state, action, reward, newState)])
+    nn.train([(state, action, reward)])
 
     state = newState
     print nn.getValues(state)
@@ -243,7 +204,7 @@ if __name__ == '__main__':
         [0,1,0],
         [0,0,0]
     ]).flatten()[np.newaxis,:]
-    nn.train([(state, action, reward, newState)])
+    nn.train([(state, action, reward)])
 
     state = newState
     print nn.getValues(state)
