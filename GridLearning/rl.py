@@ -51,18 +51,18 @@ class ReinforcementQLearning:
 	def backprop(self):
 		pass
 
-if __name__ == "__main__":
-	class DumbNeuralNet:
-		def getValues(self, state, actions):
-			actionValueList = []
-			for action in actions:
-				actionValueList.append((action, random.random()))
-			return actionValueList
+class DumbNeuralNet:
+	def getValues(self, state, actions):
+		actionValueList = []
+		for action in actions:
+			actionValueList.append((action, random.random()))
+		return actionValueList
 
-		def train(self, trainingTuples):
-			print trainingTuples
-			return True
-	
+	def train(self, trainingTuples):
+		# print trainingTuples
+		return True
+
+if __name__ == "__main__":
 	exampleState1 = [ 0 , 0, 0, 0]
 	exampleState2 = [ 1,1,1,1]
 	neuralNet = DumbNeuralNet()
