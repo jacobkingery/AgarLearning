@@ -35,9 +35,6 @@ class Layer(object):
         with tf.variable_scope(self.scope):
             return self.func(tf.matmul(x, self.W) + self.b)
 
-    def variables(self):
-        return [self.b,  self.W]
-
 class MLP(object):
     """
     Class for a NN (a.k.a. MultiLayer Perceptron)
@@ -73,12 +70,6 @@ class MLP(object):
         for layer in self.layers:
             y = layer(y)
         return self.outputFunc(y)
-
-    def variables(self):
-        res = []
-        for layer in self.layers:
-            res.extend(layer.variables())
-        return res
 
 class NeuralNet(object):
     """
