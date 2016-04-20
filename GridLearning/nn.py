@@ -75,34 +75,56 @@ class NeuralNet(object):
     """
     Overall class containing our NN
     """
-    def __init__(self, layers, optimizer=None, seeds=None):
+    def __init__(self, stateSize, numActions, inputActFunc, hiddenLayers, outputActFunc=tf.identity, optimizer=None, seeds=None, mode=0):
         """
         Initializes NN container
         Inputs:
-            layers    - list of tuples containing the number of nodes and
-                        activation function for each layer; see MLP for example
-            optimizer - optimizer for prediction error; default
-                        tf.train.RMSPropOptimizer(learning_rate=0.001, decay=0.9)
-            seeds     - list of integer seeds for layer random initializations,
-                        must be of length len(layers)-1; default [0,1,...,N]
+            stateSize     - size of state array
+            numActions    - number of actions
+            inputActFunc  - activation function after the input layer
+            hiddenLayers  - list of tuples containing the number of nodes and
+                            activation function for each hidden layer; e.g.
+                            [(10, tf.tanh), (5, tf.tanh)]
+                            for two hidden layers of size 10 and 5
+            outputActFunc - activation function after the output layer;
+                            default tf.identity
+            optimizer     - optimizer for prediction error; default
+                            tf.train.RMSPropOptimizer(learning_rate=0.001, decay=0.9)
+            seeds         - list of integer seeds for layer random initializations,
+                            must be of length len(layers)-1; default [0,1,...,N]
+            mode          - NN input/output mode; default 0
+                                0 for state in, all values out
+                                1 for state and action in, one value out
         """
         optimizer = optimizer or tf.train.RMSPropOptimizer(learning_rate=0.001, decay=0.9)
+        self.stateSize = stateSize
+        self.numActions = numActions
+        self.mode = mode
+
+        if self.mode == 0:
+            self.inputSize = self.stateSize
+            self.outputSize = self.numActions
+        elif self.mode == 1:
+            self.inputSize = self.stateSize + self.numActions
+            self.outputSize = 1
+        else:
+            raise NotImplementedError('Mode {} does not exist'.format(self.mode))
+
+        layers = [(self.inputSize, inputActFunc)] + hiddenLayers + [(self.outputSize, outputActFunc)]
         seeds = seeds or range(len(layers) - 1)
         self.neuralNet = MLP(layers, seeds)
 
         # self.session = tf.InteractiveSession()
         self.session = tf.Session()
 
-        self.stateSize = layers[0][0]
-        self.numActions = layers[-1][0]
 
-        self.observation  = tf.placeholder(tf.float32, (None, self.stateSize))
-        self.actionScores = self.neuralNet(self.observation)
+        self.inputNN = tf.placeholder(tf.float32, (None, self.inputSize))
+        self.outputNN = self.neuralNet(self.inputNN)
 
-        self.actionMask = tf.placeholder(tf.float32, (None, self.numActions))
+        self.outputMask = tf.placeholder(tf.float32, (None, self.outputSize))
         self.values = tf.placeholder(tf.float32, (None,))
-        self.maskedActionScores = tf.reduce_sum(self.actionScores * self.actionMask, reduction_indices=[1,])
-        self.predictionError = tf.reduce_mean(tf.square(self.maskedActionScores - self.values))
+        self.maskedOutput = tf.reduce_sum(self.outputNN * self.outputMask, reduction_indices=[1,])
+        self.predictionError = tf.reduce_mean(tf.square(self.maskedOutput - self.values))
         gradients = optimizer.compute_gradients(self.predictionError)
         # for i, (grad, var) in enumerate(gradients):
         #     if grad is not None:
@@ -117,21 +139,30 @@ class NeuralNet(object):
         Inputs:
             SAVs - list of tuples of (state, action, value)
         """
-        states = np.empty((len(SAVs), self.stateSize))
-        actionMask = np.zeros((len(SAVs), self.numActions))
+        states = np.empty((len(SAVs), self.inputSize))
+        outputMask = np.zeros((len(SAVs), self.outputSize))
         values = np.empty((len(SAVs),))
 
-        for i, (state, action, value) in enumerate(SAVs):
-            states[i] = state
-            actionMask[i][action] = 1
-            values[i] = value
+        if self.mode == 0:
+            for i, (state, action, value) in enumerate(SAVs):
+                states[i] = state
+                outputMask[i][action] = 1
+                values[i] = value
+
+        elif self.mode == 1:
+            outputMask[:,:] = 1
+            actions = np.identity(self.numActions)[:,np.newaxis]
+
+            for i, (state, action, value) in enumerate(SAVs):
+                states[i] = np.concatenate((state, actions[action]), axis=1)
+                values[i] = value
 
         self.session.run([
             self.predictionError,
             self.trainOp
         ], {
-            self.observation: states,
-            self.actionMask: actionMask,
+            self.inputNN: states,
+            self.outputMask: outputMask,
             self.values: values
         })
 
@@ -143,19 +174,29 @@ class NeuralNet(object):
         Outputs:
             numpy array of scores
         """
-        return self.session.run(self.actionScores, {
-            self.observation: state
-        })[0]
+        if self.mode == 0:
+            scores = self.session.run(self.outputNN, {
+                self.inputNN: state
+            })[0]
+        elif self.mode == 1:
+            actions = np.identity(self.numActions)[:,np.newaxis]
+            scores = np.zeros((self.numActions,))
+            for i,action in enumerate(actions):
+                scores[i] = self.session.run(self.outputNN, {
+                    self.inputNN: np.concatenate((state, action), axis=1)
+                })[0][0]
+        return scores
 
 
 if __name__ == '__main__':
-    layers = [
-        (9,tf.tanh),    # input
+    stateSize = 9
+    numActions = 4
+    inputActFunc = tf.tanh
+    hiddenLayers = [
         (8,tf.tanh),    # hiddens
-        (6,tf.tanh),
-        (4,tf.identity) # output
+        (6,tf.tanh)
     ]
-    nn = NeuralNet(layers)
+    nn = NeuralNet(stateSize, numActions, inputActFunc, hiddenLayers)
 
     state = np.array([
         [2,1,0],
