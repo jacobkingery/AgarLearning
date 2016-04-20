@@ -98,6 +98,9 @@ class Game(object):
 		didEat = int(self.board[newBotPos] == 1)
 		self.numEaten += didEat
 
+		if self.botPos == newBotPos:
+			didEat = -1
+
 		self.board[self.botPos] = 0
 		self.board[newBotPos] = 2
 		self.botPos = newBotPos
