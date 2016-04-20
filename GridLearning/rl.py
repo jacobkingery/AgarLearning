@@ -22,9 +22,9 @@ class ReinforcementQLearning:
 			return self.getBestActionValuePair(state)[0]
 
 	def getBestActionValuePair(self, state):
-		actionValuePairs = self.neuralNet.getValues(state, self.actions) #expects a list of tuples: [(action, value),(action, value),(action, value)]
-		bestActionValuePair = max(actionValuePairs, key=lambda pair: pair[1])
-		return bestActionValuePair
+		actionValuePairs = self.neuralNet.getValues(state)
+		bestAction = np.argmax(actionValuePairs)
+		return (bestAction, actionValuePairs[bestAction])
 
 	def storeSARS(self, state, action, reward, newState):
 		stateBestActionValuePair = self.getBestActionValuePair(state)
