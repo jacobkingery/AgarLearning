@@ -1,5 +1,7 @@
 import numpy as np
 import random 
+import matplotlib.pyplot as plt
+import time
 
 class Game(object):
 	"""This is the game class. This class allows us to 
@@ -56,6 +58,12 @@ class Game(object):
 		print "num Eaten: ", str(self.numEaten)
 		print "num Left: ", str(self.numFoods - self.numEaten)
 
+	def visGamestate(self, fig, im):
+		# replace the image contents
+		im.set_array(np.random.random((50,50)))
+		# redraw the figure
+		fig.canvas.draw()
+
 	def getPossMoves(self):
 		yPos,xPos = self.botPos
 		
@@ -95,7 +103,7 @@ class Game(object):
 			np.clip(newBotPos[1], 0, self.height)
 		)
 
-		didEat = int(self.board[newBotPos])
+		didEat = int(self.board[newBotPos] == 1)
 		self.numEaten += didEat
 
 		self.board[self.botPos] = 0
@@ -111,9 +119,23 @@ class Game(object):
 if __name__ == "__main__":
 	game = Game(5,5,1,42)
 	game.printGamestate()
-	moves = [1,2,2,2]
-	for move in moves:
-		print(game.updateGameState(move))
+	moves = range(4)
+
+	# create the figure
+	fig = plt.figure()
+	ax = fig.add_subplot(111)
+	im = ax.imshow(game.board)
+	plt.show(block=False)
+	# Get the plotting stuff all set up!
+	time.sleep(0.5)
+	while (not game.isGameOver()):
+		# game.visGamestate(fig, im)
+		time.sleep(0.5)
+		# replace the image contents
+		im.set_array(game.board)
+		# redraw the figure
+		fig.canvas.draw()
+		print(game.updateGameState(random.choice(moves)))
 		game.printGamestate()
 		print (game.isGameOver())
 		print (game.numMoves)
