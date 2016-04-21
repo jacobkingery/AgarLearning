@@ -5,6 +5,7 @@ import nn
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
+import tqdm
 
 def runningMean(arr, numPoints):
 	runningAvg = []
@@ -26,7 +27,7 @@ numFood = 3
 numActions = 4
 expRate = 0.05
 bpLength = 10
-discountFactor = 0.5
+discountFactor = 0.9
 
 stateSize = gameX * gameY
 inputActFunc = tf.tanh
@@ -38,7 +39,8 @@ myRl = rl.ReinforcementQLearning(myNN, numActions, expRate, bpLength, discountFa
 
 numGames = 100
 numMovesTaken = []
-for i in range(numGames):
+print('Playing {0} games'.format(str(numGames)))
+for i in tqdm.tqdm(range(numGames)):
 	myGame = game.Game(gameX,gameY,numFood,1)
 
 	while (not myGame.isGameOver()):
@@ -55,7 +57,7 @@ for i in range(numGames):
 
 	numMovesTaken.append(myGame.numMoves)
 
-includeInAvg = 100
+includeInAvg = 10
 runningAverage = runningMean(numMovesTaken, includeInAvg)
 
 plt.plot(numMovesTaken)
