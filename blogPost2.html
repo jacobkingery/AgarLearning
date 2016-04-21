@@ -37,6 +37,16 @@ As a result, the combination of the problem being a very difficult problem to so
 As an added benefit, since we’re the ones implementing the game (more about that below!), we also know how to interface with every part of the code instead of trying to figure out how to interface with code that other people have written. 
 
 ## Our New Project/Setup
+Our new game is inspired by Agar, but is more discretized. Its world is a grid, and there is food placed in some of the cells. The goal of the player is to eat all of the food in as few moves as possible. The allowed moves are to go up, right, down, or left by one cell. If the player is at the edge of the grid and tries to move outside of the grid, it stays in the same place.
+
+```
+2 0 1
+0 0 1
+1 0 0
+```
+In the grid representation above, the number 2 represents the player, and the three number 1s represent the food. If the player tried to move up or left, the gamestate would remain the same.
+
+In building our new system, we created modular object-oriented components containing the game logic, reinforcement learning algorithm, and neural network implementation that all come together in a main game loop. In this loop, the current state of the game is retrieved from the game object and passed into a method of the reinforcement learning object which returns the next action to take. The reinforcement learning object uses the neural network object to predict the expected values of each move and then determines which move to take. After the game object is updated with the move, it returns the reward obtained by that action as well as the new state of the game. Currently, the player is given a reward of +1 for eating a food, 0 for moving without eating a food, and -1 for not moving (running into a wall). The state, action, reward, and new state are then used by the reinforcement learning object to train the neural network.
 
 ## Some initial Learning
 
