@@ -22,9 +22,15 @@ class ReinforcementQLearning:
 			return self.getBestActionValuePair(state)[0]
 
 	def getBestActionValuePair(self, state):
+<<<<<<< HEAD
 		actionValuePairs = self.neuralNet.getValuesForActions(state, self.actions) #expects a list of tuples: [(action, value),(action, value),(action, value)]
 		bestActionValuePair = max(actionValuePairs, key=lambda pair: pair[1])
 		return bestActionValuePair
+=======
+		actionValuePairs = self.neuralNet.getValues(state)
+		bestAction = np.argmax(actionValuePairs)
+		return (bestAction, actionValuePairs[bestAction])
+>>>>>>> integration
 
 	def storeSARS(self, state, action, reward, newState):
 		stateBestActionValuePair = self.getBestActionValuePair(state)
@@ -51,6 +57,7 @@ class ReinforcementQLearning:
 	def backprop(self):
 		pass
 
+<<<<<<< HEAD
 if __name__ == "__main__":
 	class DumbNeuralNet:
 		def getValuesForActions(self, state, actions):
@@ -58,11 +65,20 @@ if __name__ == "__main__":
 			for action in actions:
 				actionValueList.append((action, random.random()))
 			return actionValueList
+=======
+class DumbNeuralNet:
+	def getValues(self, state, actions):
+		actionValueList = []
+		for action in actions:
+			actionValueList.append((action, random.random()))
+		return actionValueList
+>>>>>>> integration
 
-		def train(self, trainingTuples):
-			print trainingTuples
-			return True
-	
+	def train(self, trainingTuples):
+		# print trainingTuples
+		return True
+
+if __name__ == "__main__":
 	exampleState1 = [ 0 , 0, 0, 0]
 	exampleState2 = [ 1,1,1,1]
 	neuralNet = DumbNeuralNet()

@@ -51,7 +51,7 @@ class Game(object):
 		for foodInd in foodInds:
 			self.board[emptyRows[foodInd],emptyCols[foodInd]] = 1
 
-	def printGamestate(self):
+	def printGameState(self):
 		print self.board
 		print "num Eaten: ", str(self.numEaten)
 		print "num Left: ", str(self.numFoods - self.numEaten)
@@ -91,12 +91,15 @@ class Game(object):
 
 		#Making sure we don't go off the board
 		newBotPos = (
-			np.clip(newBotPos[0], 0, self.width),
-			np.clip(newBotPos[1], 0, self.height)
+			np.clip(newBotPos[0], 0, self.width-1),
+			np.clip(newBotPos[1], 0, self.height-1)
 		)
 
-		didEat = int(self.board[newBotPos])
+		didEat = int(self.board[newBotPos] == 1)
 		self.numEaten += didEat
+
+		if self.botPos == newBotPos:
+			didEat = -1
 
 		self.board[self.botPos] = 0
 		self.board[newBotPos] = 2
@@ -106,6 +109,9 @@ class Game(object):
 
 	def isGameOver(self):
 		return self.numEaten == self.numFoods
+
+	def flattenGameState(self):
+		return self.board.flatten()[np.newaxis,:]
 
 
 if __name__ == "__main__":
