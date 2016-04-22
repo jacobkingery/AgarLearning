@@ -50,25 +50,20 @@ In building our new system, we created modular object-oriented components contai
 
 ## Some initial Learning
 Our neaural network currently uses 1 hidden layer and has 2 modes that determine the configuration of input and output nodes. In mode 0, the input to the neural network is simply the game state and the output consists of 4 nodes, each corresponding to a different action (up, down, left, right). In mode 1, the input is the state of the game as well as the possible actions one-hot encoded. The output is a single node that corresponds the value of the particular move that was encoded in the input. 
-
 Our reinforcement algorithm is the classic [Q-Learning](https://en.wikipedia.org/wiki/Q-learning) method. 
 
 To start off we decided to look at the difference between mode 1 and mode 0 and how they performed when faced with the same intial state versus different intial states. 
-
-![](images/sameGameEveryTimeMode0.png "")
-
+[](images/sameGameEveryTimeMode0.png "")
 In the above graph of the bot in mode 0 with the same board every game, we see that number of moves it takes the bot to eat all the food qucikly decreases to arounf 6 moves (The best possible). However, every 10-50 games the number of moves spikes dramatically. At this time we are unsure what is causing this but we hypothesize that exploratory behavior may be throwing the neural net off. Even if a terrible exploratory move was made we not expect this throw the bot off so badly. 
 
-![](images/sameGameEveryTimeMode1.png "")
+[](images/sameGameEveryTimeMode1.png "")
 
 In the above graph of the bot in mode 1 with the same board every game, we see simliar early convergence behavior as mode 0. However, after that the bot begins to perform very poorly with only small areas on convergence. 
 
-![](images/differentGameEveryTimeMode0.png "")
-
+[](images/differentGameEveryTimeMode0.png "")
 In the above graph of the bot in mode 0 with a different board every game, we see a slower decrease in the number of moves it takes to win but it does nevertheless eventually get down to an average of around 13 moves. 
 
-![](images/differentGameEveryTimeMode1.png "")
-
+[](images/differentGameEveryTimeMode1.png "")
 In the above graph of the bot in mode 1 with a different board every game, we see that the bot never really improves and argueably gets worse.
 
 Based on this we will likely proceed using mode 0 for future iterations.
