@@ -69,7 +69,7 @@ for i in tqdm.tqdm(range(numGames)):
 
 			while (not myGame.isGameOver()):
 				currentState = myGameEval.flattenGameState()
-				action = myRl.getAction(currentState, evaluation=False)
+				action = myRl.getAction(currentState, evaluation=True)
 				reward = myGameEval.updateGameState(action)
 				nextState = myGameEval.flattenGameState()
 
