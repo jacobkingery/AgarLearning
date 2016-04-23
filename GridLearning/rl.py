@@ -12,11 +12,11 @@ class ReinforcementQLearning:
 		self.discountFactor = discountFactor
 		self.learningRate = learningRate
 		self.actions = range(numberOfActions)
-		self.SAVRSAV = [] 
+		self.SAVRSAV = []
 		self.currentSAVRSAVIndex = 0
 
-	def getAction(self, state):
-		if random.random()<self.exploratoryRate:
+	def getAction(self, state, evaluation=False):
+		if random.random()<self.exploratoryRate and not evaluation:
 			return random.choice(self.actions)
 		else:
 			return self.getBestActionValuePair(state)[0]
