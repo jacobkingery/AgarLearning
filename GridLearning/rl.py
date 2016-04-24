@@ -27,11 +27,11 @@ class ReinforcementQLearning:
 		return (bestAction, actionValuePairs[bestAction])
 
 	def storeSARS(self, state, action, reward, newState):
-		stateBestActionValuePair = self.getBestActionValuePair(state)
+		# stateBestActionValuePair = self.getBestActionValuePair(state)
 		newStateBestActionValuePair = self.getBestActionValuePair(newState)
 		SAVRSAVdict = {'state': state,
 					   'action': action,
-					   'predictedValueOfAction': stateBestActionValuePair[1], 
+					   'predictedValueOfAction': self.neuralNet.getValues(state)[action], 
 					   'reward': reward,
 					   'newState': newState,
 					   'newBestAction': newStateBestActionValuePair[0],

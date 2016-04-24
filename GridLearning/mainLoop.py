@@ -24,14 +24,14 @@ def runningMean(arr, numPoints):
 randomSeed = 42
 gameX = 3
 gameY = 3
-numFood = 3
+numFood = 1
 numActions = 4
-expRate = 0.05
+expRate = 0.2
 bpLength = 10
-discountFactor = 0.9
+discountFactor = 0.5
 
 stateSize = gameX * gameY
-inputActFunc = tf.tanh
+inputActFunc = tf.identity
 hiddenLayers = [(25, tf.tanh)]
 mode = 0
 
@@ -42,6 +42,7 @@ numGames = 1000
 numMovesTaken = []
 numGamesEvalIterationList = []
 numGamesEvalAverageList = []
+numGamesEvalMedianList = []
 print('Playing {0} games'.format(str(numGames)))
 for i in tqdm.tqdm(range(numGames)):
 	myGame = game.Game(gameX,gameY,numFood,i)
@@ -62,23 +63,26 @@ for i in tqdm.tqdm(range(numGames)):
 
 	numMovesTaken.append(myGame.numMoves)
 
-	if i%50 ==0:
+	if i%50 == 0 and i!=0:
 		numGamesEvalList = []
 		for j in range(20):
 			myGameEval = game.Game(gameX,gameY,numFood,j*.11)
 
-			while (not myGame.isGameOver()):
+			while (not myGameEval.isGameOver()) and myGameEval.numMoves < 100:
 				currentState = myGameEval.flattenGameState()
 				action = myRl.getAction(currentState, evaluation=True)
 				reward = myGameEval.updateGameState(action)
 				nextState = myGameEval.flattenGameState()
-
-			numGamesEvalList.append(myGame.numMoves)
+			print myGameEval.numMoves
+			numGamesEvalList.append(myGameEval.numMoves)
 		numGamesEvalIterationList.append(i)
 		numGamesEvalAverageList.append(np.mean(numGamesEvalList))
+		numGamesEvalMedianList.append(np.median(numGamesEvalList))
 
 
-plt.bar(numGamesEvalIterationList, numGamesEvalAverageList)
+plt.bar(np.array(numGamesEvalIterationList)-5, numGamesEvalAverageList,color='b',width=10)
+plt.bar(np.array(numGamesEvalIterationList)+5, numGamesEvalMedianList,color='g',width=10)
+plt.legend(['mean','median'])
 plt.xlabel('games trained on')
 plt.ylabel('eval average number of moves')
 plt.title('Different Game Every Time: mode ' + str(mode))
