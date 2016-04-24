@@ -1,6 +1,7 @@
 import game
 import rl
 import nn
+import random
 
 import tensorflow as tf
 import matplotlib.pyplot as plt
@@ -32,16 +33,20 @@ discountFactor = 0.9
 stateSize = gameX * gameY
 inputActFunc = tf.tanh
 hiddenLayers = [(25, tf.tanh)]
-mode = 1
+mode = 0
 
 myNN = nn.NeuralNet(stateSize, numActions, inputActFunc, hiddenLayers, mode=mode)
 myRl = rl.ReinforcementQLearning(myNN, numActions, expRate, bpLength, discountFactor, learningRate=1, randomSeed=randomSeed)
 
-numGames = 100
+numGames = 1000
 numMovesTaken = []
+numGamesEvalIterationList = []
+numGamesEvalAverageList = []
 print('Playing {0} games'.format(str(numGames)))
 for i in tqdm.tqdm(range(numGames)):
-	myGame = game.Game(gameX,gameY,numFood,1)
+	myGame = game.Game(gameX,gameY,numFood,i)
+	# if i == 0:
+	# 	myGame.printGameState()
 
 	while (not myGame.isGameOver()):
 		currentState = myGame.flattenGameState()
@@ -53,9 +58,33 @@ for i in tqdm.tqdm(range(numGames)):
 		myRl.train()
 
 		# if i == numGames-1:
-			# myGame.printGameState()
+		# 	myGame.printGameState()
 
 	numMovesTaken.append(myGame.numMoves)
+
+	if i%50 ==0:
+		numGamesEvalList = []
+		for j in range(20):
+			myGameEval = game.Game(gameX,gameY,numFood,j*.11)
+
+			while (not myGame.isGameOver()):
+				currentState = myGameEval.flattenGameState()
+				action = myRl.getAction(currentState, evaluation=True)
+				reward = myGameEval.updateGameState(action)
+				nextState = myGameEval.flattenGameState()
+
+			numGamesEvalList.append(myGame.numMoves)
+		numGamesEvalIterationList.append(i)
+		numGamesEvalAverageList.append(np.mean(numGamesEvalList))
+
+
+plt.bar(numGamesEvalIterationList, numGamesEvalAverageList)
+plt.xlabel('games trained on')
+plt.ylabel('eval average number of moves')
+plt.title('Different Game Every Time: mode ' + str(mode))
+plt.show()
+
+	
 
 includeInAvg = 10
 runningAverage = runningMean(numMovesTaken, includeInAvg)
@@ -65,5 +94,5 @@ plt.plot(runningAverage, 'r')
 plt.legend(['number of moves taken', 'sliding average ({})'.format(includeInAvg)])
 plt.xlabel('game number')
 plt.ylabel('number of moves')
-plt.title('mode {}'.format(mode))
+plt.title('Different Game Every Time: mode ' + str(mode))
 plt.show()
