@@ -1,12 +1,17 @@
 import game
 import rl
 import nn
+<<<<<<< daff32742dcaea85a584c9276b33c928b588738e
 import random
+=======
+import vis
+>>>>>>> some playing around with the vis stuff
 
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
 import tqdm
+
 
 def runningMean(arr, numPoints):
 	runningAvg = []
@@ -45,8 +50,6 @@ numGamesEvalMedianList = []
 print('Playing {0} games'.format(str(numGames)))
 for i in tqdm.tqdm(range(numGames)):
 	myGame = game.Game(gameX,gameY,numFood,i)
-	# if i == 0:
-	# 	myGame.printGameState()
 
 	while (not myGame.isGameOver()):
 		currentState = myGame.flattenGameState()
@@ -99,3 +102,13 @@ plt.xlabel('game number')
 plt.ylabel('number of moves')
 plt.title('Different Game Every Time: mode ' + str(mode))
 plt.show()
+
+goalState = np.zeros((gameY,gameX))
+
+goalState[(gameY-1)/2, (gameX-1)/2] = 1
+
+vis.visAllStatesGivenGoal(myRl, goalState)
+
+
+numMovesTaken.append(visGame.numMoves)
+
