@@ -12,11 +12,11 @@ class ReinforcementQLearning:
 		self.discountFactor = discountFactor
 		self.learningRate = learningRate
 		self.actions = range(numberOfActions)
-		self.SAVRSAV = [] 
+		self.SAVRSAV = []
 		self.currentSAVRSAVIndex = 0
 
-	def getAction(self, state):
-		if random.random()<self.exploratoryRate:
+	def getAction(self, state, evaluation=False):
+		if random.random()<self.exploratoryRate and not evaluation:
 			return random.choice(self.actions)
 		else:
 			return self.getBestActionValuePair(state)[0]
@@ -27,11 +27,11 @@ class ReinforcementQLearning:
 		return (bestAction, actionValuePairs[bestAction])
 
 	def storeSARS(self, state, action, reward, newState):
-		stateBestActionValuePair = self.getBestActionValuePair(state)
+		# stateBestActionValuePair = self.getBestActionValuePair(state)
 		newStateBestActionValuePair = self.getBestActionValuePair(newState)
 		SAVRSAVdict = {'state': state,
 					   'action': action,
-					   'predictedValueOfAction': stateBestActionValuePair[1], 
+					   'predictedValueOfAction': self.neuralNet.getValues(state)[action], 
 					   'reward': reward,
 					   'newState': newState,
 					   'newBestAction': newStateBestActionValuePair[0],
