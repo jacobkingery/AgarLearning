@@ -8,13 +8,13 @@ class Layer(object):
     """
     Class for a NN layer
     """
-    def __init__(self, numInputs, actFunc, numOutputs, seed=None, scope='layer'):
+    def __init__(self, numInputs, numOutputs, actFunc, seed=None, scope='layer'):
         """
         Initializes layer
         Inputs:
             numInputs  - number of inputs to this layer
-            actFunc    - activation function between this layer and the next
             numOutputs - number of outputs from this layer
+            actFunc    - activation function between this layer and the next
             seed       - integer seed for random initialization; default None
             scope      - TF variable scope; must be unique for each layer;
                          default 'layer'
@@ -53,17 +53,17 @@ class MLP(object):
         """
         self.outputFunc = layers[-1][1]
 
-        self.layers = [None] * (len(layers) - 1)
-        seeds = seeds or [None] * len(self.layers)
+        self.layers = []
+        seeds = seeds or [None] * (len(layers) - 1)
         with tf.variable_scope(scope):
-            for i in range(len(self.layers)):
-                self.layers[i] = Layer(
+            for i in range(1, len(layers)):
+                self.layers.append(Layer(
+                    layers[i-1][0],
                     layers[i][0],
                     layers[i][1],
-                    layers[i+1][0],
-                    seeds[i],
+                    seeds[i-1],
                     'layer{}'.format(i)
-                )
+                ))
 
     def __call__(self, x):
         y = x
@@ -75,13 +75,12 @@ class NeuralNet(object):
     """
     Overall class containing our NN
     """
-    def __init__(self, stateSize, numActions, inputActFunc, hiddenLayers, outputActFunc=tf.identity, optimizer=None, seeds=None, mode=0):
+    def __init__(self, stateSize, numActions, hiddenLayers, outputActFunc=tf.identity, optimizer=None, seeds=None, mode=0):
         """
         Initializes NN container
         Inputs:
             stateSize     - size of state array
             numActions    - number of actions
-            inputActFunc  - activation function after the input layer
             hiddenLayers  - list of tuples containing the number of nodes and
                             activation function for each hidden layer; e.g.
                             [(10, tf.tanh), (5, tf.tanh)]
@@ -110,7 +109,7 @@ class NeuralNet(object):
         else:
             raise NotImplementedError('Mode {} does not exist'.format(self.mode))
 
-        layers = [(self.inputSize, inputActFunc)] + hiddenLayers + [(self.outputSize, outputActFunc)]
+        layers = [(self.inputSize, None)] + hiddenLayers + [(self.outputSize, outputActFunc)]
         seeds = seeds or range(len(layers) - 1)
         self.neuralNet = MLP(layers, seeds)
 
@@ -206,25 +205,23 @@ class NeuralNet(object):
 if __name__ == '__main__':
     stateSize = 9
     numActions = 4
-    inputActFunc = tf.tanh
     hiddenLayers = [
-        (8,tf.tanh),    # hiddens
-        (6,tf.tanh)
+        (25,tf.tanh),    # hiddens
     ]
-    nn = NeuralNet(stateSize, numActions, inputActFunc, hiddenLayers)
+    nn = NeuralNet(stateSize, numActions, hiddenLayers)
 
     state = np.array([
+        [2,0,0],
+        [1,1,0],
+        [0,0,0]
+    ]).flatten()[np.newaxis,:]
+    print nn.getValues(state)
+
+    action = 2
+    reward = 1
+    newState = np.array([
+        [0,0,0],
         [2,1,0],
-        [0,1,0],
-        [0,0,0]
-    ]).flatten()[np.newaxis,:]
-    print nn.getValues(state)
-
-    action = 1
-    reward = 10
-    newState = np.array([
-        [0,2,0],
-        [0,1,0],
         [0,0,0]
     ]).flatten()[np.newaxis,:]
     nn.train([(state, action, reward)])
@@ -232,24 +229,24 @@ if __name__ == '__main__':
     state = newState
     print nn.getValues(state)
 
-    action = 0
-    reward = -10
+    action = 2
+    reward = 0
     newState = np.array([
-        [0,2,0],
+        [0,0,0],
         [0,1,0],
-        [0,0,0]
+        [2,0,0]
     ]).flatten()[np.newaxis,:]
     nn.train([(state, action, reward)])
 
     state = newState
     print nn.getValues(state)
 
-    action = 0
-    reward = -10
+    action = 2
+    reward = -1
     newState = np.array([
-        [0,2,0],
+        [0,0,0],
         [0,1,0],
-        [0,0,0]
+        [2,0,0]
     ]).flatten()[np.newaxis,:]
     nn.train([(state, action, reward)])
 
