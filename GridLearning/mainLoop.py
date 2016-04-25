@@ -31,11 +31,10 @@ bpLength = 10
 discountFactor = 0.5
 
 stateSize = gameX * gameY
-inputActFunc = tf.identity
 hiddenLayers = [(25, tf.tanh)]
 mode = 0
 
-myNN = nn.NeuralNet(stateSize, numActions, inputActFunc, hiddenLayers, mode=mode)
+myNN = nn.NeuralNet(stateSize, numActions, hiddenLayers, mode=mode)
 myRl = rl.ReinforcementQLearning(myNN, numActions, expRate, bpLength, discountFactor, learningRate=1, randomSeed=randomSeed)
 
 numGames = 1000
