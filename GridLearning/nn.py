@@ -201,6 +201,21 @@ class NeuralNet(object):
             actionValuePairs.append((action,value))
         return actionValuePairs
 
+    def getLayerWeights(self, layerNum):
+        """
+        Inputs the number of the layer and returns the weights of the neurons in that layer
+        Inputs:
+            layerNum: the number of the layer. Layer 0 is the first hidden layer, and layer -1 is the output layer
+        Outputs:
+            numpy matrix of the layers in the shape (numInputs, numOutputs)
+        """
+        # layer 0 is the first hidden layer 
+        # layer -1 is the output layer
+        weights =  self.neuralNet.layers[layerNum].W.eval(session = self.session)
+
+        return weights
+        
+
 
 if __name__ == '__main__':
     stateSize = 9
