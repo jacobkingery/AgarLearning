@@ -2,21 +2,22 @@ import numpy as np
 import random
 
 class ReinforcementQLearning:
-	def __init__(self, neuralNet, numberOfActions, exploratoryRate, backpropLength, discountFactor, learningRate=1, randomSeed=random.random()):
+	def __init__(self, neuralNet, numberOfActions, exploratoryRateFn, backpropLength, discountFactorFn, learningRateFn, randomSeed=random.random()):
 		# Learning rate of 1 is optimal for deterministic environments
 		random.seed(randomSeed)
 		self.neuralNet = neuralNet
 		self.numberOfActions = numberOfActions
-		self.exploratoryRate = exploratoryRate
+		self.exploratoryRateFn = exploratoryRateFn
 		self.backpropLength = backpropLength
-		self.discountFactor = discountFactor
-		self.learningRate = learningRate
+		self.discountFactorFn = discountFactorFn
+		self.learningRateFn = learningRateFn
 		self.actions = range(numberOfActions)
 		self.SAVRSAV = []
 		self.currentSAVRSAVIndex = 0
 
-	def getAction(self, state, evaluation=False):
-		if random.random()<self.exploratoryRate and not evaluation:
+	def getAction(self, state, i=0, evaluation=False):
+		exploratoryRate = self.exploratoryRateFn(i)
+		if (not evaluation) and (random.random() < exploratoryRate):
 			return random.choice(self.actions)
 		else:
 			return self.getBestActionValuePair(state)[0]
@@ -39,11 +40,13 @@ class ReinforcementQLearning:
 		self.SAVRSAV.append(SAVRSAVdict)
 		return SAVRSAVdict
 
-	def train(self):
+	def train(self, i):
+		learningRate = self.learningRateFn(i)
+		discountFactor = self.discountFactorFn(i)
 		trainingTuples = []
 		while self.currentSAVRSAVIndex < len(self.SAVRSAV):
 			currentSAVRSAV = self.SAVRSAV[self.currentSAVRSAVIndex]
-			value = currentSAVRSAV['predictedValueOfAction'] + self.learningRate * (currentSAVRSAV['reward'] + self.discountFactor*currentSAVRSAV['predictedValueOfNewAction'] - currentSAVRSAV['predictedValueOfAction'] )
+			value = currentSAVRSAV['predictedValueOfAction'] + learningRate * (currentSAVRSAV['reward'] + discountFactor*currentSAVRSAV['predictedValueOfNewAction'] - currentSAVRSAV['predictedValueOfAction'])
 			trainingTuples.append((currentSAVRSAV['state'],currentSAVRSAV['action'],value))
 			self.currentSAVRSAVIndex += 1
 		return self.neuralNet.train(trainingTuples)
@@ -53,26 +56,30 @@ class ReinforcementQLearning:
 
 if __name__ == "__main__":
 	class DumbNeuralNet:
-		def getValues(self, state, actions):
-			actionValueList = []
-			for action in actions:
-				actionValueList.append((action, random.random()))
-			return actionValueList
+		def getValues(self, state):
+			return [random.random() for _ in range(4)]
 
 		def train(self, trainingTuples):
 			# print trainingTuples
 			return True
 
-	exampleState1 = [ 0 , 0, 0, 0]
-	exampleState2 = [ 1,1,1,1]
+	exampleState1 = [0,0,0,0]
+	exampleState2 = [1,1,1,1]
 	neuralNet = DumbNeuralNet()
 	numberOfActions = 4
-	exploratoryRate = 0
 	backpropLength = 0
-	discountFactor = .5
-	qRL = ReinforcementQLearning(neuralNet, numberOfActions, exploratoryRate, backpropLength, discountFactor)
-	print qRL.getAction(exampleState1)
+	
+	def expRate(i):
+		return 0.3
+	def discountFactor(i):
+		return 0.5
+	def learningRate(i):
+		return 1
+
+	qRL = ReinforcementQLearning(neuralNet, numberOfActions, expRate, backpropLength, discountFactor, learningRate)
+	i = 0
+	print qRL.getAction(exampleState1, i)
 	print qRL.storeSARS(exampleState1, 1, 2, exampleState2)
 	print qRL.storeSARS(exampleState2, 3, 0, exampleState1)
-	print qRL.train()
+	print qRL.train(i)
 	
