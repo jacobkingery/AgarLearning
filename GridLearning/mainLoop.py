@@ -26,18 +26,38 @@ gameX = 3
 gameY = 3
 numFood = 1
 numActions = 4
-expRate = 0.2
 bpLength = 10
-discountFactor = 0.5
+
+def constDiscountFactor(i):
+	return 0.5
+def incDiscountFactor(i):
+	initial = 0.2
+	final = 0.5
+	rate = 0.001
+	return min(initial + i*rate, final)
+
+def constExpRate(i):
+	return 0.2
+def decayExpRate(i):
+	N = 0.5
+	tau = 1000.0
+	return N * np.exp(-i / tau)
+
+def constLearningRate(i):
+	return 1
+def decayLearningRate(i):
+	N = 0.9
+	tau = 100.0
+	return N * np.exp(-i / tau)
 
 stateSize = gameX * gameY
 hiddenLayers = [(25, tf.tanh)]
 mode = 0
 
 myNN = nn.NeuralNet(stateSize, numActions, hiddenLayers, mode=mode)
-myRl = rl.ReinforcementQLearning(myNN, numActions, expRate, bpLength, discountFactor, learningRate=1, randomSeed=randomSeed)
+myRl = rl.ReinforcementQLearning(myNN, numActions, constExpRate, bpLength, constDiscountFactor, constLearningRate, randomSeed=randomSeed)
 
-numGames = 1000
+numGames = 500
 numMovesTaken = []
 numGamesEvalIterationList = []
 numGamesEvalAverageList = []
@@ -50,12 +70,12 @@ for i in tqdm.tqdm(range(numGames)):
 
 	while (not myGame.isGameOver()):
 		currentState = myGame.flattenGameState()
-		action = myRl.getAction(currentState)
+		action = myRl.getAction(currentState, i)
 		reward = myGame.updateGameState(action)
 		nextState = myGame.flattenGameState()
 
 		myRl.storeSARS(currentState, action, reward, nextState)
-		myRl.train()
+		myRl.train(i)
 
 		# if i == numGames-1:
 		# 	myGame.printGameState()
