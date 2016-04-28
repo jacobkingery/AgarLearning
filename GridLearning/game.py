@@ -31,7 +31,7 @@ class Game(object):
 		self.botPos = (random.sample(range(self.height), 1)[0],random.sample(range(self.width),1)[0])
 		# self.botPos = (0,0)
 
-		self.board[0,0] = 0
+		self.board[self.botPos] = 0
 
 		self.foodPos = []
 		self.didGetCloserToFood = False

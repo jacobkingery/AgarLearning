@@ -49,6 +49,7 @@ for i in tqdm.tqdm(range(numGames)):
 	myGame = game.Game(gameX,gameY,numFood,i)
 	botPos = myGame.botPos
 	while (not myGame.isGameOver()):
+		myGame.printGameState()
 		currentState = myGame.flattenGameState()
 		action = myRl.getAction(currentState)
 		moveCloser = myGame.didGetCloserToFood
