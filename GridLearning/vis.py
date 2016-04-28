@@ -14,7 +14,7 @@ def visStateAction (state, action):
 		(0,-1)
 	]
 
-	botRow,botCol = np.where(state == 2)
+	botRow,botCol = np.where(state == 0)
 
 	arrowTailX = botCol[0] + 0.5
 	arrowTailY = botRow[0] + 0.5
