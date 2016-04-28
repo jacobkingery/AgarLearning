@@ -57,7 +57,6 @@ def visAllStatesGivenGoal (myRl, goalState):
 		arrowHeadY = 0.35*actionToChange[action][0]
 		ax.arrow(arrowTailX, arrowTailY, arrowHeadX, arrowHeadY, head_width=0.05, head_length=0.1, fc='k', ec='k')
 
-	ax.invert_yaxis()
 	plt.show()
 
 def visNN (nn, boardX, boardY):
@@ -74,8 +73,8 @@ def visNN (nn, boardX, boardY):
 	f, axarr = plt.subplots(subplotDim, subplotDim, figsize=(10, 10))
 
 	for neuronNum in range(numNeurons):
-		subplotRow = neuronNum/5
-		subplotCol = neuronNum % 5
+		subplotRow = neuronNum/subplotDim
+		subplotCol = neuronNum % subplotDim
 		ax = axarr[subplotRow, subplotCol]
 		learnedWeights = weights[:,neuronNum]
 		weightsReshaped = learnedWeights.reshape((boardY, boardX))
