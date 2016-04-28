@@ -26,10 +26,10 @@ class Game(object):
 		# of columns
 		self.width = x
 		self.height = y
-		self.board = np.zeros((self.height,self.width))
+		self.board = -1 * np.ones((self.height,self.width))
 		# set the initial condidition of the bot
 		self.botPos = (0,0)
-		self.board[0,0] = 2
+		self.board[0,0] = 0
 
 		self.generateFood()
 
@@ -39,7 +39,7 @@ class Game(object):
 	def generateFood(self):
 		# this returns two numpy arrays, one corresponding to
 		# rows, the other two columns
-		emptyRows,emptyCols = np.where(self.board == 0)
+		emptyRows,emptyCols = np.where(self.board == -1)
 
 		numEmpty = len(emptyRows)
  
@@ -101,8 +101,8 @@ class Game(object):
 		if self.botPos == newBotPos:
 			didEat = -1
 
-		self.board[self.botPos] = 0
-		self.board[newBotPos] = 2
+		self.board[self.botPos] = -1
+		self.board[newBotPos] = 0
 		self.botPos = newBotPos
 
 		return didEat
@@ -116,11 +116,11 @@ class Game(object):
 
 if __name__ == "__main__":
 	game = Game(5,5,1,42)
-	game.printGamestate()
+	game.printGameState()
 	moves = [1,2,2,2]
 	for move in moves:
 		print(game.updateGameState(move))
-		game.printGamestate()
+		game.printGameState()
 		print (game.isGameOver())
 		print (game.numMoves)
 		

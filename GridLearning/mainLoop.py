@@ -2,11 +2,13 @@ import game
 import rl
 import nn
 import random
+import vis
 
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
 import tqdm
+
 
 def runningMean(arr, numPoints):
 	runningAvg = []
@@ -65,8 +67,6 @@ numGamesEvalMedianList = []
 print('Playing {0} games'.format(str(numGames)))
 for i in tqdm.tqdm(range(numGames)):
 	myGame = game.Game(gameX,gameY,numFood,i)
-	# if i == 0:
-	# 	myGame.printGameState()
 
 	while (not myGame.isGameOver()):
 		currentState = myGame.flattenGameState()
@@ -99,23 +99,33 @@ for i in tqdm.tqdm(range(numGames)):
 		numGamesEvalMedianList.append(np.median(numGamesEvalList))
 
 
-plt.bar(np.array(numGamesEvalIterationList)-5, numGamesEvalAverageList,color='b',width=10)
-plt.bar(np.array(numGamesEvalIterationList)+5, numGamesEvalMedianList,color='g',width=10)
-plt.legend(['mean','median'])
-plt.xlabel('games trained on')
-plt.ylabel('eval average number of moves')
-plt.title('Different Game Every Time: mode ' + str(mode))
-plt.show()
+
+# plt.bar(np.array(numGamesEvalIterationList)-5, numGamesEvalAverageList,color='b',width=10)
+# plt.bar(np.array(numGamesEvalIterationList)+5, numGamesEvalMedianList,color='g',width=10)
+# plt.legend(['mean','median'])
+# plt.xlabel('games trained on')
+# plt.ylabel('eval average number of moves')
+# plt.title('Different Game Every Time: mode ' + str(mode))
+# plt.show()
 
 	
 
-includeInAvg = 10
-runningAverage = runningMean(numMovesTaken, includeInAvg)
+# includeInAvg = 10
+# runningAverage = runningMean(numMovesTaken, includeInAvg)
 
-plt.plot(numMovesTaken)
-plt.plot(runningAverage, 'r')
-plt.legend(['number of moves taken', 'sliding average ({})'.format(includeInAvg)])
-plt.xlabel('game number')
-plt.ylabel('number of moves')
-plt.title('Different Game Every Time: mode ' + str(mode))
-plt.show()
+# plt.plot(numMovesTaken)
+# plt.plot(runningAverage, 'r')
+# plt.legend(['number of moves taken', 'sliding average ({})'.format(includeInAvg)])
+# plt.xlabel('game number')
+# plt.ylabel('number of moves')
+# plt.title('Different Game Every Time: mode ' + str(mode))
+# plt.show()
+
+testGame = game.Game(gameX,gameY,numFood,randomSeed)
+
+goalState = testGame.board.copy()
+goalState[0,0] = -1
+
+vis.visAllStatesGivenGoal(myRl, goalState)
+
+vis.visNN(myNN, gameX, gameY)
