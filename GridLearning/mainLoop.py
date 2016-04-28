@@ -26,20 +26,20 @@ def runningMean(arr, numPoints):
 randomSeed = 42
 gameX = 3
 gameY = 3
-numFood = 1
+numFood = 3
 numActions = 4
 expRate = 0.2
 bpLength = 10
 discountFactor = 0.5
 
 stateSize = gameX * gameY
-hiddenLayers = [(25, tf.tanh)]
+hiddenLayers = [(9, tf.tanh)]
 mode = 0
 
 myNN = nn.NeuralNet(stateSize, numActions, hiddenLayers, mode=mode)
-myRl = rl.ReinforcementQLearning(myNN, numActions, expRate, bpLength, discountFactor, learningRate=1, randomSeed=randomSeed)
+myRl = rl.ReinforcementQLearning(myNN, numActions, expRate, bpLength, discountFactor, learningRate=0.2, randomSeed=randomSeed)
 
-numGames = 1000
+numGames = 10000
 numMovesTaken = []
 numGamesEvalIterationList = []
 numGamesEvalAverageList = []
@@ -47,14 +47,20 @@ numGamesEvalMedianList = []
 print('Playing {0} games'.format(str(numGames)))
 for i in tqdm.tqdm(range(numGames)):
 	myGame = game.Game(gameX,gameY,numFood,i)
-
+	botPos = myGame.botPos
 	while (not myGame.isGameOver()):
 		currentState = myGame.flattenGameState()
 		action = myRl.getAction(currentState)
-		reward = myGame.updateGameState(action)
+		moveCloser = myGame.didGetCloserToFood
+		reward = myGame.updateGameState(action) + 0.1 * int(moveCloser)
+		newBotPos = myGame.botPos
+
 		nextState = myGame.flattenGameState()
 
-		myRl.storeSARS(currentState, action, reward, nextState)
+		myRl.storeSARS(currentState, 
+			action, 
+			reward, 
+			nextState)
 		myRl.train()
 
 		# if i == numGames-1:
@@ -70,9 +76,10 @@ for i in tqdm.tqdm(range(numGames)):
 			while (not myGameEval.isGameOver()) and myGameEval.numMoves < 100:
 				currentState = myGameEval.flattenGameState()
 				action = myRl.getAction(currentState, evaluation=True)
-				reward = myGameEval.updateGameState(action)
+				moveCloser = myGameEval.didGetCloserToFood
+				reward = myGameEval.updateGameState(action) + 0.1 * int(moveCloser)
 				nextState = myGameEval.flattenGameState()
-			print myGameEval.numMoves
+			# print myGameEval.numMoves
 			numGamesEvalList.append(myGameEval.numMoves)
 		numGamesEvalIterationList.append(i)
 		numGamesEvalAverageList.append(np.mean(numGamesEvalList))
@@ -80,26 +87,24 @@ for i in tqdm.tqdm(range(numGames)):
 
 
 
-# plt.bar(np.array(numGamesEvalIterationList)-5, numGamesEvalAverageList,color='b',width=10)
-# plt.bar(np.array(numGamesEvalIterationList)+5, numGamesEvalMedianList,color='g',width=10)
-# plt.legend(['mean','median'])
-# plt.xlabel('games trained on')
-# plt.ylabel('eval average number of moves')
-# plt.title('Different Game Every Time: mode ' + str(mode))
-# plt.show()
+plt.bar(np.array(numGamesEvalIterationList)-5, numGamesEvalAverageList,color='b',width=10)
+plt.bar(np.array(numGamesEvalIterationList)+5, numGamesEvalMedianList,color='g',width=10)
+plt.legend(['mean','median'])
+plt.xlabel('games trained on')
+plt.ylabel('eval average number of moves')
+plt.title('Different Game Every Time: mode ' + str(mode))
+plt.show()
 
-	
+includeInAvg = 10
+runningAverage = runningMean(numMovesTaken, includeInAvg)
 
-# includeInAvg = 10
-# runningAverage = runningMean(numMovesTaken, includeInAvg)
-
-# plt.plot(numMovesTaken)
-# plt.plot(runningAverage, 'r')
-# plt.legend(['number of moves taken', 'sliding average ({})'.format(includeInAvg)])
-# plt.xlabel('game number')
-# plt.ylabel('number of moves')
-# plt.title('Different Game Every Time: mode ' + str(mode))
-# plt.show()
+plt.plot(numMovesTaken)
+plt.plot(runningAverage, 'r')
+plt.legend(['number of moves taken', 'sliding average ({})'.format(includeInAvg)])
+plt.xlabel('game number')
+plt.ylabel('number of moves')
+plt.title('Different Game Every Time: mode ' + str(mode))
+plt.show()
 
 testGame = game.Game(gameX,gameY,numFood,randomSeed)
 
