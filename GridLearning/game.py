@@ -27,6 +27,13 @@ class Game(object):
 		self.width = x
 		self.height = y
 
+		self.board = -1 * np.ones((self.height,self.width))
+		# set the initial condidition of the bot
+		self.botPos = (random.sample(range(self.height), 1)[0],random.sample(range(self.width),1)[0])
+		# self.botPos = (0,0)
+
+		self.board[self.botPos] = 0
+
 		self.foodPos = []
 		self.didGetCloserToFood = False
 
