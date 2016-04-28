@@ -69,7 +69,6 @@ def visNN (nn, boardX, boardY):
 	# Set up the subplot stuff!
 	# WE're going to try to make a square
 	subplotDim = int(round((float(numNeurons)**0.5)))
-	print subplotDim
 	f, axarr = plt.subplots(subplotDim, subplotDim, figsize=(10, 10))
 
 	for neuronNum in range(numNeurons):
