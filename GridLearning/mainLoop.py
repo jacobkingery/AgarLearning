@@ -69,6 +69,7 @@ for i in tqdm.tqdm(range(numGames)):
 	myGame = game.Game(gameX,gameY,numFood,i)
 	botPos = myGame.botPos
 	while (not myGame.isGameOver()):
+		myGame.printGameState()
 		currentState = myGame.flattenGameState()
 		actionExpPair = myRl.getAction(currentState, i)
 		action = actionExpPair[0]
