@@ -15,10 +15,30 @@ class ReinforcementQLearning:
 		self.SAVRSAV = []
 		self.currentSAVRSAVIndex = 0
 
-	def getAction(self, state, i=0, evaluation=False):
+	def getAction(self, state, i=0, evaluation=False, useB = True):
 		exploratoryRate = self.exploratoryRateFn(i)
-		if (not evaluation) and (random.random() < exploratoryRate):
-			return random.choice(self.actions), True
+		
+		
+		if (not evaluation and useB):
+			actionValuePairs = self.neuralNet.getValues(state)
+
+			boltzmann = [np.exp(value/exploratoryRate) for value in actionValuePairs]
+			boltzmannSum = sum(boltzmann)
+
+			boltzmann = [prob/boltzmannSum for prob in boltzmann]
+
+			cutOffValues = np.cumsum(boltzmann)
+			randomNumber = random.random()
+			action = np.argmax(cutOffValues > randomNumber)
+			
+			isExploratory = (action == np.argmax(boltzmann))
+			
+			# print action, isExploratory
+			return action, isExploratory
+			
+		elif (not evaluation and (random.random() < exploratoryRate)):
+			return random.choice(range(4)), True
+
 		else:
 			return self.getBestActionValuePair(state)[0], False
 
