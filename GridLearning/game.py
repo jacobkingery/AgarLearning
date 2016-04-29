@@ -9,7 +9,7 @@ class Game(object):
 	1: right
 	2: down
 	3: left"""
-	def __init__(self, x, y, numFoods, randomSeed):
+	def __init__(self, x, y, numFoods, randomSeed, presetBoard=None):
 		"""Here, we initialize the game state. this creates
 		an x,y grid where we start the bot in the 0,0 corner
 		then, we add numFoods to the grid. In this game, the
@@ -26,12 +26,17 @@ class Game(object):
 		# of columns
 		self.width = x
 		self.height = y
-		self.board = -1 * np.ones((self.height,self.width))
-		# set the initial condidition of the bot
-		self.botPos = (0,0)
-		self.board[0,0] = 0
+		if presetBoard is None:
+			self.board = -1 * np.ones((self.height,self.width))
+			# set the initial condidition of the bot
+			self.botPos = (0,0)
+			self.board[0,0] = 0
+			self.generateFood()
+		else:
+			self.board = presetBoard
+			self.botPos = (0,0)
 
-		self.generateFood()
+		
 
 		self.numMoves = 0
 
