@@ -18,9 +18,9 @@ class ReinforcementQLearning:
 	def getAction(self, state, i=0, evaluation=False):
 		exploratoryRate = self.exploratoryRateFn(i)
 		if (not evaluation) and (random.random() < exploratoryRate):
-			return random.choice(self.actions)
+			return random.choice(self.actions), True
 		else:
-			return self.getBestActionValuePair(state)[0]
+			return self.getBestActionValuePair(state)[0], False
 
 	def getBestActionValuePair(self, state):
 		actionValuePairs = self.neuralNet.getValues(state)
