@@ -26,7 +26,7 @@ def runningMean(arr, numPoints):
 randomSeed = 42
 gameX = 3
 gameY = 3
-numFood = 3
+numFood = 1
 numActions = 4
 bpLength = 10
 
@@ -69,7 +69,6 @@ for i in tqdm.tqdm(range(numGames)):
 	myGame = game.Game(gameX,gameY,numFood,i)
 	botPos = myGame.botPos
 	while (not myGame.isGameOver()):
-		myGame.printGameState()
 		currentState = myGame.flattenGameState()
 		actionExpPair = myRl.getAction(currentState, i)
 		action = actionExpPair[0]
