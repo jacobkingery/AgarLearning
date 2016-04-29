@@ -36,6 +36,9 @@ class Game(object):
 		self.foodPos = []
 		self.didGetCloserToFood = False
 
+		self.foodPos = []
+		self.didGetCloserToFood = False
+
 		self.generateFood()
 
 		self.numMoves = 0
