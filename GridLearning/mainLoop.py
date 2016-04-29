@@ -59,7 +59,6 @@ mode = 0
 myNN = nn.NeuralNet(stateSize, numActions, hiddenLayers, mode=mode)
 myRl = rl.ReinforcementQLearning(myNN, numActions, decayExpRate, bpLength, constDiscountFactor, constLearningRate, randomSeed=randomSeed)
 
-
 numGames = 10000
 numMovesTaken = []
 numGamesEvalIterationList = []
@@ -95,6 +94,7 @@ for i in tqdm.tqdm(range(numGames)):
 			while (not myGameEval.isGameOver()) and myGameEval.numMoves < 100:
 				currentState = myGameEval.flattenGameState()
 				action = myRl.getAction(currentState, evaluation=True)[0]
+
 				moveCloser = myGameEval.didGetCloserToFood
 				reward = myGameEval.updateGameState(action) + 0.1 * int(moveCloser)
 				nextState = myGameEval.flattenGameState()
