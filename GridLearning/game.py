@@ -27,6 +27,9 @@ class Game(object):
 		self.width = x
 		self.height = y
 
+		self.foodPos = []
+		self.didGetCloserToFood = False
+
 		if presetBoard is None:
 			self.board = -1 * np.ones((self.height,self.width))
 			# set the initial condidition of the bot
@@ -39,14 +42,7 @@ class Game(object):
 			self.board = presetBoard
 			self.botPos = (0,0)
 
-		self.foodPos = []
-		self.didGetCloserToFood = False
 
-		self.foodPos = []
-		self.didGetCloserToFood = False
-
-		self.foodPos = []
-		self.didGetCloserToFood = False
 
 		self.numMoves = 0
 		

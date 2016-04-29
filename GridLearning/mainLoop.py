@@ -89,8 +89,8 @@ for i in tqdm.tqdm(range(numGames)):
 		actionExpPair = myRl.getAction(currentState, i)
 		action = actionExpPair[0]
 		exp = actionExpPair[1]
-		moveCloser = myGame.didGetCloserToFood
-		reward = myGame.updateGameState(action) + 0.1 * int(moveCloser)
+		# moveCloser = myGame.didGetCloserToFood
+		reward = myGame.updateGameState(action) #+ 0.1 * int(moveCloser)
 		nextState = myGame.flattenGameState()
 
 		# if not exp:
@@ -109,11 +109,8 @@ for i in tqdm.tqdm(range(numGames)):
 			while (not myGameEval.isGameOver()) and myGameEval.numMoves < 100:
 				currentState = myGameEval.flattenGameState()
 				action = myRl.getAction(currentState, evaluation=True)[0]
-
-				moveCloser = myGameEval.didGetCloserToFood
-				reward = myGameEval.updateGameState(action) + 0.1 * int(moveCloser)
-				nextState = myGameEval.flattenGameState()
-			# print myGameEval.numMoves
+				reward = myGameEval.updateGameState(action) #+ 0.1 * int(moveCloser)
+			print myGameEval.numMoves
 			numGamesEvalList.append(myGameEval.numMoves)
 		numGamesEvalIterationList.append(i)
 		numGamesEvalAverageList.append(np.mean(numGamesEvalList))
