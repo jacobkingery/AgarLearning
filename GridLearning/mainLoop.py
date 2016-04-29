@@ -69,7 +69,7 @@ def decayLearningRate(i):
 	return N * np.exp(-i / tau)
 
 stateSize = gameX * gameY
-hiddenLayers = [(25, tf.tanh)]
+hiddenLayers = [(9, tf.tanh)]
 mode = 0
 
 myNN = nn.NeuralNet(stateSize, numActions, hiddenLayers, mode=mode)
@@ -83,13 +83,14 @@ numGamesEvalMedianList = []
 print('Playing {0} games'.format(str(numGames)))
 for i in tqdm.tqdm(range(numGames)):
 	myGame = game.Game(gameX,gameY,numFood,i)
-
+	botPos = myGame.botPos
 	while (not myGame.isGameOver()):
 		currentState = myGame.flattenGameState()
 		actionExpPair = myRl.getAction(currentState, i)
 		action = actionExpPair[0]
 		exp = actionExpPair[1]
-		reward = myGame.updateGameState(action)
+		moveCloser = myGame.didGetCloserToFood
+		reward = myGame.updateGameState(action) + 0.1 * int(moveCloser)
 		nextState = myGame.flattenGameState()
 
 		# if not exp:
@@ -108,9 +109,11 @@ for i in tqdm.tqdm(range(numGames)):
 			while (not myGameEval.isGameOver()) and myGameEval.numMoves < 100:
 				currentState = myGameEval.flattenGameState()
 				action = myRl.getAction(currentState, evaluation=True)[0]
-				reward = myGameEval.updateGameState(action)
+
+				moveCloser = myGameEval.didGetCloserToFood
+				reward = myGameEval.updateGameState(action) + 0.1 * int(moveCloser)
 				nextState = myGameEval.flattenGameState()
-			print myGameEval.numMoves
+			# print myGameEval.numMoves
 			numGamesEvalList.append(myGameEval.numMoves)
 		numGamesEvalIterationList.append(i)
 		numGamesEvalAverageList.append(np.mean(numGamesEvalList))
@@ -125,8 +128,6 @@ plt.xlabel('games trained on')
 plt.ylabel('eval average number of moves')
 plt.title('Different Game Every Time: mode ' + str(mode))
 plt.show()
-
-	
 
 includeInAvg = 10
 runningAverage = runningMean(numMovesTaken, includeInAvg)

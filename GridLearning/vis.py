@@ -47,8 +47,7 @@ def visAllStatesGivenGoal (myRl, goalState):
 	for row,col in zip(possRow,possCol):
 		tempGameState = goalState.copy()
 		tempGameState[col, row] = 0
-		print tempGameState
-		action = myRl.getAction(tempGameState.flatten()[np.newaxis,:], evaluation=True)[0]
+		action = myRl.getAction(tempGameState.flatten()[np.newaxis,:], evaluation=True)
 		
 		arrowTailX = col + 0.5
 		arrowTailY = row + 0.5
@@ -69,7 +68,6 @@ def visNN (nn, boardX, boardY):
 	# Set up the subplot stuff!
 	# WE're going to try to make a square
 	subplotDim = int(round((float(numNeurons)**0.5)))
-	print subplotDim
 	f, axarr = plt.subplots(subplotDim, subplotDim, figsize=(10, 10))
 
 	for neuronNum in range(numNeurons):

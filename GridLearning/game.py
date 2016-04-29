@@ -26,19 +26,31 @@ class Game(object):
 		# of columns
 		self.width = x
 		self.height = y
+
 		if presetBoard is None:
 			self.board = -1 * np.ones((self.height,self.width))
 			# set the initial condidition of the bot
 			self.botPos = (0,0)
+			# self.botPos = (random.sample(range(self.height), 1)[0],random.sample(range(self.width),1)[0])
+			self.board[self.botPos] = 0
 			self.board[0,0] = 0
 			self.generateFood()
 		else:
 			self.board = presetBoard
 			self.botPos = (0,0)
 
-		
+		self.foodPos = []
+		self.didGetCloserToFood = False
+
+		self.foodPos = []
+		self.didGetCloserToFood = False
+
+		self.foodPos = []
+		self.didGetCloserToFood = False
 
 		self.numMoves = 0
+		
+		
 
 
 	def generateFood(self):
@@ -55,7 +67,7 @@ class Game(object):
 		foodInds = random.sample(range(numEmpty), self.numFoods)
 		for foodInd in foodInds:
 			self.board[emptyRows[foodInd],emptyCols[foodInd]] = 1
-
+			self.foodPos.append((emptyRows[foodInd],emptyCols[foodInd]))
 	def printGameState(self):
 		print self.board
 		print "num Eaten: ", str(self.numEaten)
@@ -104,7 +116,19 @@ class Game(object):
 		self.numEaten += didEat
 
 		if self.botPos == newBotPos:
-			didEat = -1
+			didEat = -0.5
+
+
+		# See whether the bot got closer to food
+		oldDistFood = [(food[0] - self.botPos[0], food[1] - self.botPos[1]) for food in self.foodPos]
+		newDistFood = [(food[0] - newBotPos[0], food[1] - newBotPos[1]) for food in self.foodPos]
+		
+
+		self.didGetCloserToFood = False
+		for i in range(len(oldDistFood)):
+			if ((oldDistFood[i][0] < newDistFood[i][0]) or (oldDistFood[i][1] < newDistFood[i][1])):
+				self.didGetCloserToFood = True
+
 
 		self.board[self.botPos] = -1
 		self.board[newBotPos] = 0
