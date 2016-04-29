@@ -48,7 +48,7 @@ def visAllStatesGivenGoal (myRl, goalState):
 		tempGameState = goalState.copy()
 		tempGameState[col, row] = 0
 		print tempGameState
-		action = myRl.getAction(tempGameState.flatten()[np.newaxis,:], evaluation=True)
+		action = myRl.getAction(tempGameState.flatten()[np.newaxis,:], evaluation=True)[0]
 		
 		arrowTailX = col + 0.5
 		arrowTailY = row + 0.5
