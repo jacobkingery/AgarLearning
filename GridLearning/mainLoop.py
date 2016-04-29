@@ -59,7 +59,7 @@ mode = 0
 myNN = nn.NeuralNet(stateSize, numActions, hiddenLayers, mode=mode)
 myRl = rl.ReinforcementQLearning(myNN, numActions, decayExpRate, bpLength, constDiscountFactor, constLearningRate, randomSeed=randomSeed)
 
-numGames = 20000
+numGames = 10000
 numMovesTaken = []
 numGamesEvalIterationList = []
 numGamesEvalAverageList = []
