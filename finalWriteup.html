@@ -26,26 +26,73 @@
 # Final Writeup
 **Jacob, Mac-I, and Sophia**
 
-## Goals of our project/Background Vocabulary
-For our project we were interested in teaching a computer how to do things ...
+## Project Background
+For our final data science project, we were interested in learning about two different machine learning tools or techniques: reinforcement learning and neural networks. In other words, we were interested in teaching a computer how to do something using a neural network. Before we dive too deep into the technical details of our project, let’s explain both reinforcement learning and neural networks.
+
 ### Reinforcement Learning
+
+In most of the machine learning we’ve done in this course up until now, we were trying to learn a model that would allow us to predict the correct output given a set of previously collected inputs. While this is great if you already have a lot of data collected, this wasn’t the case for us. Since we were trying to teach a computer how to do something, in our case play a game, we didn’t have a dataset readily collected. As a result, we had two options. First, we could collect a dataset of us, or other people, playing a game, and teach the computer how to play a game. Our other option, reinforcement learning, was to let a computer teach itself how to play a game by seeing which actions have positive results and which have negative consequences. For a more in-depth explanation of a simple implementation of an example of reinforcement learning, please take a look at our [blog post!] (http://jacobkingery.github.io/AgarLearning/blogPost1.html)
+
+Before we dive into the specifics of our exact problem setup and reinforcement learning implementation, let’s define some vocabulary! (These definitions are taken from our first blog post.)
+
+**State (s):** We define the state as everything the computer currently knows about what is happening. 
+
+**Action (a):** Although this is fairly self-explanatory,an action is anything that a computer can do when the game is in a certain state.
+
+**Policy (π):** Our policy is a function that defines how the computer behaves at any given point in time.
+
+**Reward function:** The reward function tells the computer, that, given a certain state-action pair the reward for performing that action, given the current state. This reward is determined based on how desirable the result of performing a given action from a given state is. The reward of transitioning from state s to state s' given action a is normally written as r(s,a,s')
+
+**Value function:** Although some state, action pairs might have a good immediate outcome, they might not be as desirable in the long-term. The value function seeks to predict the long-term desirability of a state action pair. The predicted value of a given state under policy π, is written as vπ(s), while the value of state s and taking action a is written as qπ(s,a).
+
+
+Although we used a type of reinforcement learning called Q-learning in our project, there are other approaches for reinforcement learning. For more information about other approaches to reinforcement learning and more information about reinforcement learning in general, check out one of our favorite resources [“Reinforcement Learning: An Introduction", by Richard Sutton and Andrew Barto](https://webdocs.cs.ualberta.ca/~sutton/book/the-book.html).
 
 ### Neural Networks
 
-## Our intial project
+## Our initial Project
+(the agar.io example!)
 
 ## Our Simple Setup
+Due to the struggles we had with our Agar.io reinforcement learning approach, we developed our own, simpler game. This game consisted of a gridded board of variable rectangular dimensions. Each square could contain a food, the bot, or nothing. We encoded 
 
 ### Our Sysem
 This section will contain a system digram and an explanation of how everything is related
 
 ## Our Explorations
 
-### Learning to Play 1 Game
+* Learning to play 1 game (Story: We could learn to play any game, but we’re going to use games that take the least time to learn -- 3x3, 1 food)
+  * sameGame-3x3_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-training
+  * sameGame-4x4_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-training
+* Different Game every n games (Story: nice stepping stone  -- we can learn multiple games. This is fairly short. -- if this winds up not being interesting, let’s delete this)
+  * differentGame10-3x3_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-training
+  * differentGame10-3x3_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-eval
+* Different Game every time (Story: took it to the next level; it took longer but it did learn)
+  * differentGame-3x3_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-training
+  * differentGame-3x3_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-eval
+* Focus on different game every time
+* Play with exploratory rate
+  * Greedy-e
+    * Constant vs decay
+      * differentGame-3x3_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-eval
+      * differentGame-3x3_1-constDF_0.5-greedy-decayER_0.2_1000-constLR_0.9-eval
+  * Boltzmann
+    * Constant vs decay
+      * differentGame-3x3_1-constDF_0.5-Boltz-constER_0.2-constLR_0.9-eval
+      * differentGame-3x3_1-constDF_0.5-Boltz-decayER_0.2_1000-constLR_0.9-eval
+  * summary/conclusions
+    * Overall spikes are lower with boltzmann
+      * differentGame-3x3_1-constDF_0.5-Boltz-decayER_0.2_1000-constLR_0.9-training
+      * differentGame-3x3_1-constDF_0.5-greedy-decayER_0.2_1000-constLR_0.9-training
+* Play with learning rate
+  * Constant vs decay
+    * differentGame-3x3_1-constDF_0.5-Boltz-decayER_0.2_1000-constLR_0.9-eval
+    * differentGame-3x3_1-constDF_0.5-Boltz-decayER_0.2_1000-decayLR_0.9_1000-eval
+* Other game spaces (Multiple food)
+  * differentGame-3x3_3-constDF_0.5-Boltz-decayER_0.2_1000-decayLR_0.9_1000-eval
 
-### Different Game every n games
 
-### New game every time
+
 </xmp>
 
 <script src="http://strapdownjs.com/v/0.2/strapdown.js"></script>
