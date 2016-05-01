@@ -73,7 +73,7 @@ hiddenLayers = [(9, tf.tanh)]
 mode = 0
 
 myNN = nn.NeuralNet(stateSize, numActions, hiddenLayers, mode=mode)
-myRl = rl.ReinforcementQLearning(myNN, numActions, decayExpRate, bpLength, constDiscountFactor, constLearningRate, randomSeed=randomSeed)
+myRl = rl.ReinforcementQLearning(myNN, numActions, constExpRate, bpLength, constDiscountFactor, constLearningRate, randomSeed=randomSeed)
 
 numGames = 10000
 numMovesTaken = []
@@ -117,26 +117,20 @@ for i in tqdm.tqdm(range(numGames)):
 
 
 
-plt.bar(np.array(numGamesEvalIterationList)-5, numGamesEvalAverageList,color='b',width=10)
-plt.bar(np.array(numGamesEvalIterationList)+5, numGamesEvalMedianList,color='g',width=10)
-plt.legend(['mean','median'])
-plt.xlabel('games trained on')
-plt.ylabel('eval average number of moves')
-plt.title('Different Game Every Time: mode ' + str(mode))
+plt.bar(np.array(numGamesEvalIterationList), numGamesEvalAverageList,color='b',edgecolor = "none",width=50)
+plt.xlabel('Games trained on')
+plt.ylabel('Mean number of moves to complete evaluation boards')
 plt.show()
 
-includeInAvg = 10
+includeInAvg = 100
 runningAverage = runningMean(numMovesTaken, includeInAvg)
 
 plt.plot(numMovesTaken)
 plt.plot(runningAverage, 'r')
-plt.legend(['number of moves taken', 'sliding average ({})'.format(includeInAvg)])
-plt.xlabel('game number')
-plt.ylabel('number of moves')
-plt.title('Different Game Every Time: mode ' + str(mode))
+plt.legend(['Number of moves taken', 'Sliding average ({})'.format(includeInAvg)])
+plt.xlabel('Game number')
+plt.ylabel('Number of moves')
 plt.show()
-
-testGame = game.Game(gameX,gameY,numFood,1)
 
 
 # Plot the viz for each of the eval boards! 
@@ -144,7 +138,7 @@ testGame = game.Game(gameX,gameY,numFood,1)
 for evalBoard in evalBoards:
 	goalState = evalBoard.copy()
 	# override bot position
-	goalState[0,0]= -1
+	goalState[0,0] = -1
 	vis.visAllStatesGivenGoal(myRl, goalState)
 
 vis.visNN(myNN, gameX, gameY)
