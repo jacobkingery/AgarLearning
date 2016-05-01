@@ -47,23 +47,30 @@ def visAllStatesGivenGoal (myRl, goalState):
 
 	for row,col in zip(possRow,possCol):
 		tempGameState = goalState.copy()
-		tempGameState[col, row] = 0
+		tempGameState[row, col] = 0
+
 		action = myRl.getAction(tempGameState.flatten()[np.newaxis,:], evaluation=True)[0]
-		
+
 		arrowTailX = col + 0.5
-		arrowTailY = row + 0.5
+		arrowTailY = row + 0.5 
 
 		arrowHeadX = 0.35*actionToChange[action][1]
 		arrowHeadY = 0.35*actionToChange[action][0]
 		ax.arrow(arrowTailX, arrowTailY, arrowHeadX, arrowHeadY, head_width=0.05, head_length=0.1, fc='k', ec='k')
+	
+	ax.xaxis.set_ticks(np.arange(0.5,3.5,1))
+	ax.xaxis.set_ticklabels(np.arange(0,3,1))
+	ax.yaxis.set_ticks(np.arange(0.5,3.5,1))
+	ax.yaxis.set_ticklabels(np.arange(0,3,1))
+
 	ax.invert_yaxis()
 	plt.show()
 
 def visNN (nn, boardX, boardY):
-	# Note: this assumes that we are playing in Mode 0 and the inpus is the board
+	# Note: this assumes that we are playing in Mode 0 and the input is the board
 	
 	weights =  nn.getLayerWeights(0)
-	print weights.shape
+
 	numNeurons = weights.shape[1]
 
 	# Set up the subplot stuff!
@@ -74,7 +81,7 @@ def visNN (nn, boardX, boardY):
 	# f, axarr = plt.subplots(subplotDim, subplotDim, figsize=(10, 10))
 	grid = AxesGrid(fig, 111, 
 					nrows_ncols = (subplotDim, subplotDim),
-					axes_pad=0.05,
+					axes_pad=0.5,
 					share_all=True,
 					label_mode="L",
 					cbar_location="right",
@@ -91,11 +98,12 @@ def visNN (nn, boardX, boardY):
 						vmax=maxWeight, 
 						cmap="seismic")
 		ax.set_title('Neuron {0}'.format(neuronNum))
+		ax.xaxis.set_ticks(np.arange(0.5,3.5,1))
+		ax.xaxis.set_ticklabels(np.arange(0,3,1))
+		ax.yaxis.set_ticks(np.arange(0.5,3.5,1))
+		ax.yaxis.set_ticklabels(np.arange(0,3,1))
 		ax.invert_yaxis()
 	grid.cbar_axes[0].colorbar(mat)
-
-	# for cax in grid.cbar_axes:
-	# 	cax.toggle_label(False)
 
 	plt.show()
 

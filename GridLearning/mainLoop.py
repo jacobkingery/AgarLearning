@@ -85,7 +85,6 @@ for i in tqdm.tqdm(range(numGames)):
 	myGame = game.Game(gameX,gameY,numFood,i)
 	botPos = myGame.botPos
 	while (not myGame.isGameOver()):
-		myGame.printGameState()
 		currentState = myGame.flattenGameState()
 		actionExpPair = myRl.getAction(currentState, i)
 		action = actionExpPair[0]
@@ -103,7 +102,7 @@ for i in tqdm.tqdm(range(numGames)):
 
 	numMovesTaken.append(myGame.numMoves)
 
-	if i%50 == 0 and i!=0:
+	if (i+1)%50 == 0:
 		numGamesEvalList = []
 		for evalBoard in evalBoards:
 			myGameEval = game.Game(gameX,gameY,numFood,1, presetBoard=evalBoard.copy())
@@ -111,7 +110,6 @@ for i in tqdm.tqdm(range(numGames)):
 				currentState = myGameEval.flattenGameState()
 				action = myRl.getAction(currentState, evaluation=True)[0]
 				reward = myGameEval.updateGameState(action) #+ 0.1 * int(moveCloser)
-			print myGameEval.numMoves
 			numGamesEvalList.append(myGameEval.numMoves)
 		numGamesEvalIterationList.append(i)
 		numGamesEvalAverageList.append(np.mean(numGamesEvalList))
@@ -138,11 +136,15 @@ plt.ylabel('number of moves')
 plt.title('Different Game Every Time: mode ' + str(mode))
 plt.show()
 
-testGame = game.Game(gameX,gameY,numFood,randomSeed)
+testGame = game.Game(gameX,gameY,numFood,1)
 
-goalState = testGame.board.copy()
-goalState[0,0] = -1
 
-vis.visAllStatesGivenGoal(myRl, goalState)
+# Plot the viz for each of the eval boards! 
+# (Comment this out if you don't want it!)
+for evalBoard in evalBoards:
+	goalState = evalBoard.copy()
+	# override bot position
+	goalState[0,0]= -1
+	vis.visAllStatesGivenGoal(myRl, goalState)
 
 vis.visNN(myNN, gameX, gameY)
