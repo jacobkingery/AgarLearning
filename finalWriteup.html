@@ -142,21 +142,31 @@ In this system diagram, we have color coded where in our code each part happens.
 
   It definitely took longer to learn to eat the food on the 4 by 4 board but it did learn to eat the food in 4 moves in less than 100 games.
 
-### Different Game every n games 
-(Story: nice stepping stone  -- we can learn multiple games. This is fairly short. -- if this winds up not being interesting, let’s delete this)
+### Different game every n games 
+  Before diving straight into a different board every game we choose to examine what would happen if we switched the boards every 50 games. The below figure shows our evaluation graph for this scenario. Our evaluation graphs were created by testing the bot on every possible board every 50 games. For example in the 3 by 3 case with 1 food there are 8 possible boards, in the 3 by 3 case with 2 foods there are 28 possible boards. For each board we allowed the bot 100 moves to eat all the food. If it hadn't completed the game in that length of time we knew it was impossible (on smaller boards) for it too eat all the food. We then plot the mean number of moves it took that bot to complete all the possible boards. 
+
   ![](images/differentGameEvery50-3x3_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-eval.png "")
     _The above shows the evaluation results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and exploratory rate of 0.2 running on a different board every 50 games._
+
+  What we see here is that it's not really doing any generalized learning. The mean number of moves to complete a game is not decreasing overall. However, when we look at the training results we see a more nuanced story.
 
   ![](images/differentGameEvery50-3x3_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-training.png "")
     _The above shows the training results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and exploratory rate of 0.2 running on a different board every 50 games._
 
-### Different Game every time 
-(Story: took it to the next level; it took longer but it did learn)
+  For the most part we see that there is a large spike in the number of moves played every 50 games (when the board changes) but it then quickly adapts to the new board state.
+
+### Different game every time 
+  Finally, we tried our system out on a different board every game. 
+
   ![](images/differentGame-3x3_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-eval.png "")
     _The above shows the evaluation results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and exploratory rate of 0.2 running on a different board every game._
 
+  In the above graph we can see that it is learning to eat the food better and better the more games is plays. Toward the end it is even playing the games perfectly most of the time. Let's take a look at our training graph.
+
   ![](images/differentGame-3x3_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-training.png "")
     _The above shows the training results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and exploratory rate of 0.2 running on a different board every game._
+
+  Similarly to our evaluation graph, we see that the bot improves over time. We also see that the bot is taking less time to complete a game even when it is not playing optimally. This is fantastic!
 
 * Focus on different game every time
 * Action Selection
