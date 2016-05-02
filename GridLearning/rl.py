@@ -6,7 +6,7 @@ class ReinforcementQLearning:
     Class for a reinforcement q learning
     """
 	def __init__(self, neuralNet, numberOfActions, exploratoryRateFn, backpropLength, discountFactorFn, learningRateFn, randomSeed=random.random()):
-		        """
+		"""
         Initializes Class
         Inputs:
             neuralNet  		  - A nueral net (as defined in nn.py)
