@@ -166,60 +166,67 @@ In this system diagram, we have color coded where in our code each part happens.
   ![](images/differentGame-3x3_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-training.png "")
     _The above shows the training results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and exploratory rate of 0.2 running on a different board every game._
 
-  Similarly to our evaluation graph, we see that the bot improves over time. We also see that the bot is taking less time to complete a game even when it is not playing optimally. This is fantastic!
+  Similarly to our evaluation graph, we see that the bot improves over time. We also see that the bot is taking less time to complete a game even when it is not playing optimally. This is fantastic! From this point on we decided to focus on playing on a different board every game.
 
-* Focus on different game every time
-* Action Selection
-    #### $\epsilon$-greedy
+###Action Selection
+#### $\epsilon$-greedy
+One method of choosing which action to take is known as $\epsilon$-greedy, which selects the action with the highest value with probability $(1 - \epsilon)$ and a random action with probability $\epsilon$.
+We explored different values of $\epsilon$, or exploratory rate, both constant and changing over time.
 
-      One method of choosing which action to take is known as $\epsilon$-greedy, which selects the action with the highest value with probability $(1 - \epsilon)$ and a random action with probability $\epsilon$.
-      We explored different values of $\epsilon$, or exploratory rate, both constant and changing over time.
-    
-      ![](images/differentGame-3x3_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-eval.png "")
+![](images/differentGame-3x3_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-eval.png "")
 
-      _The above shows the evaluation results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and exploratory rate of 0.2._
+_The above shows the evaluation results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and exploratory rate of 0.2._
 
-      ![](images/differentGame-3x3_1-constDF_0.5-greedy-decayER_0.5_5000-constLR_0.9-eval.png "")
+![](images/differentGame-3x3_1-constDF_0.5-greedy-decayER_0.5_5000-constLR_0.9-eval.png "")
 
-       _The above shows the evaluation results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and exploratory rate decaying from 0.5 with a time constant of 5000 games._
+ _The above shows the evaluation results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and exploratory rate decaying from 0.5 with a time constant of 5000 games._
 
-      Using a fixed discount factor and learning rate, the best constant exploratory rate we found was 0.2. This means that each time we make a move (unless we're evaluating), there is a 20% chance of taking a random action instead of choosing the action with the greatest value predicted by the neural network.
-      We also looked at decreasing the exploratory rate each game using an exponential decay function.  The best parameters we found for this were a starting value of 0.5 and a time constant of 5000 games.  This appears to be better than the constant exploratory rate; it learns optimal play faster using the decaying exploratory rate.
+Using a fixed discount factor and learning rate, the best constant exploratory rate we found was 0.2. This means that each time we make a move (unless we're evaluating), there is a 20% chance of taking a random action instead of choosing the action with the greatest value predicted by the neural network.
+We also looked at decreasing the exploratory rate each game using an exponential decay function.  The best parameters we found for this were a starting value of 0.5 and a time constant of 5000 games.  This appears to be better than the constant exploratory rate; it learns optimal play faster using the decaying exploratory rate.
 
-    #### Soft-max
+#### Soft-max
   
-      Another method of action selection that we tried uses a soft-max with a Boltzmann distribution. This chooses the action with probabilities of $(e^{Q[s,a]/T})/(\sum_{a} e^{Q[s,a]/T})$ where $Q[s,a]$ is the value for a given state-action pair and $T$ is the "temperature", or how randomly it should choose actions.
-      We explored different values of $T$, both constant and changing over time.
-    
-      ![](images/differentGame-3x3_1-constDF_0.5-Boltz-constER_0.2-constLR_0.9-eval.png "")
+Another method of action selection that we tried uses a soft-max with a Boltzmann distribution. This chooses the action with probabilities of $(e^{Q[s,a]/T})/(\sum_{a} e^{Q[s,a]/T})$ where $Q[s,a]$ is the value for a given state-action pair and $T$ is the "temperature", or how randomly it should choose actions.
+We explored different values of $T$, both constant and changing over time.
 
-      _The above shows the evaluation results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and temperature of 0.2._
+![](images/differentGame-3x3_1-constDF_0.5-Boltz-constER_0.2-constLR_0.9-eval.png "")
 
-      ![](images/differentGame-3x3_1-constDF_0.5-Boltz-decayER_0.2_2000-constLR_0.9-eval.png "")
+_The above shows the evaluation results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and temperature of 0.2._
 
-      _The above shows the evaluation results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and temperature decaying from 0.2 with a time constant of 2000 games._
+![](images/differentGame-3x3_1-constDF_0.5-Boltz-decayER_0.2_2000-constLR_0.9-eval.png "")
 
-      Using a fixed discount factor and learning rate, the best constant temperature we found was also 0.2. Also like in $\epsilon$-greedy, using an exponential decay function was better than holding the temperature constant. Here, a starting value of 0.5 and a time constant of 2000 games learned the fastest.
-      Something worth noting is that changing the starting value to 0.19 or 0.21 caused it to get stuck during a game a few thousand games in. We think this is due to the temperature dropping too low and not allowing it to move randomly when it needs to explore more. It appears that we were lucky with the starting value of 0.2.
+_The above shows the evaluation results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and temperature decaying from 0.2 with a time constant of 2000 games._
 
-    #### Conclusion
+Using a fixed discount factor and learning rate, the best constant temperature we found was also 0.2. Also like in $\epsilon$-greedy, using an exponential decay function was better than holding the temperature constant. Here, a starting value of 0.5 and a time constant of 2000 games learned the fastest.
+Something worth noting is that changing the starting value to 0.19 or 0.21 caused it to get stuck during a game a few thousand games in. We think this is due to the temperature dropping too low and not allowing it to move randomly when it needs to explore more. It appears that we were lucky with the starting value of 0.2.
 
-      Overall, it seems that the soft-max action selection is better than the $\epsilon$-greedy method. It learns faster and better, having smaller spikes later on when not evaluating (shown below, note the ranges of the y-axes).
+#### Conclusion
 
-      ![](images/differentGame-3x3_1-constDF_0.5-greedy-decayER_0.5_5000-constLR_0.9-training.png "")
+Overall, it seems that the soft-max action selection is better than the $\epsilon$-greedy method. It learns faster and better, having smaller spikes later on when not evaluating (shown below, note the ranges of the y-axes).
 
-      _The above shows the training results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and exploratory rate decaying from 0.5 with a time constant of 5000 games._
+![](images/differentGame-3x3_1-constDF_0.5-greedy-decayER_0.5_5000-constLR_0.9-training.png "")
 
-      ![](images/differentGame-3x3_1-constDF_0.5-Boltz-constER_0.2-constLR_0.9-training.png "")
+_The above shows the training results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and exploratory rate decaying from 0.5 with a time constant of 5000 games._
 
-      _The above shows the training results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and temperature of 0.2._
+![](images/differentGame-3x3_1-constDF_0.5-Boltz-constER_0.2-constLR_0.9-training.png "")
 
-* Play with learning rate
-  * Constant vs decay
-    * ![](images/differentGame-3x3_1-constDF_0.5-Boltz-constER_0.2-constLR_0.1-eval.png "")
-    * ![](images/differentGame-3x3_1-constDF_0.5-Boltz-constER_0.2-decayLR_0.4_2000-eval.png "")
-* Other game spaces (Multiple food)
-  * ![](images/sameGame-3x3_3-constDF_0.5-greedy-constER_0.2-constLR_0.1-eval.png "")
+_The above shows the training results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and temperature of 0.2._
+
+### Play with learning rate
+####Constant vs decay
+To start exploring the effect of varying the learning rate we tested a variety on constant learning rates from .01 to 1. We found that for the 3 by 3 board with 1 food the optimal constant learning rate was .1. The results from this test are shown below.
+![](images/differentGame-3x3_1-constDF_0.5-Boltz-constER_0.2-constLR_0.1-eval.png "")
+_The above shows the evaluation results for a 3x3 grid with 1 food, discount factor of 0.5, temperature of 0.2, and a learning rate of 0.1._
+
+The results from this test were decent. It almost entirely stopped making errors by around 6500 games. Similarly to the testing we did on constant learning rates, we tried decaying the learning rate. The best results we had with a decaying learning rate are shown below.
+
+![](images/differentGame-3x3_1-constDF_0.5-Boltz-constER_0.2-decayLR_0.4_2000-eval.png "")
+_The above shows the evaluation results for a 3x3 grid with 1 food, discount factor of 0.5, temperature of 0.2, and a decaying initial learning rate of .4 with a time constant of 2000._
+
+The best parameters with a decaying learning rate allowed for the bot to learn faster initially but it appears that it the constant learning rate allowed the bot to reach consistently optimal performance earlier.
+
+### Other game spaces (Multiple food)
+![](images/sameGame-3x3_3-constDF_0.5-greedy-constER_0.2-constLR_0.1-eval.png "")
 
 
 
