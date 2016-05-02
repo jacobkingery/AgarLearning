@@ -104,7 +104,7 @@ We then feed this into the neural network to help it learn a better Q function.
 ### Putting it all together
 To combine the game, our reinforcement learning algorithm, and the neural network to do actual learning, we created a main loop (GridLearning/mainLoop.py) to handle us playing tons of games and having the computer learn from them. Our system diagram for this can be seen below:
 
-![](images/System_Diagram.png "")
+![](images/System_Diagram.jpg "")
 
 In this system diagram, we have color coded where in our code each part happens. The left-most column are all the steps that we go through. For steps with additional rectangles to the right, these rectangles provide more information based on how we're going about performing those steps. These steps all the way on the left are the steps we perform in GridLearning/mainLoop.py. In this system diagram, there are some steps in our process that also have rectangles extending to the left. In these cases, these rectangles provide slightly more information about what we're actually doing in each of those steps.
 
