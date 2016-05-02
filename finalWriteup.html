@@ -143,17 +143,17 @@ In this system diagram, we have color coded where in our code each part happens.
   It definitely took longer to learn to eat the food on the 4 by 4 board but it did learn to eat the food in 4 moves in less than 100 games.
 
 ### Different game every n games 
-  Before diving straight into a different board every game we choose to examine what would happen if we switched the boards every 50 games. The below figure shows our evaluation graph for this scenario. Our evaluation graphs were created by testing the bot on every possible board every 50 games. For example in the 3 by 3 case with 1 food there are 8 possible boards, in the 3 by 3 case with 2 foods there are 28 possible boards. For each board we allowed the bot 100 moves to eat all the food. If it hadn't completed the game in that length of time we knew it was impossible (on smaller boards) for it too eat all the food. We then plot the mean number of moves it took that bot to complete all the possible boards. 
+  Before diving straight into a different board every game we choose to examine what would happen if we switched the boards every 50 games. The below figure shows our evaluation graph for this scenario. Our evaluation graphs were created by testing the bot on every possible board every 50 games. For example in the 3 by 3 case with 1 food there are 8 possible boards, in the 3 by 3 case with 2 foods there are 28 possible boards. For each board we allowed the bot 100 moves to eat all the food. If it hadn't completed the game in that length of time we knew it was impossible (on this size board) for complete the game. We then plot the mean number of moves it took that bot to complete all the possible boards. 
 
   ![](images/differentGameEvery50-3x3_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-eval.png "")
     _The above shows the evaluation results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and exploratory rate of 0.2 running on a different board every 50 games._
 
-  What we see here is that it's not really doing any generalized learning. The mean number of moves to complete a game is not decreasing overall. However, when we look at the training results we see a more nuanced story.
+  What we see here is that it's not really doing any generalized learning. The mean number of moves to complete all the different boards is not decreasing overall. However, when we look at the training results we see a more nuanced story.
 
   ![](images/differentGameEvery50-3x3_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-training.png "")
     _The above shows the training results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and exploratory rate of 0.2 running on a different board every 50 games._
 
-  For the most part we see that there is a large spike in the number of moves played every 50 games (when the board changes) but it then quickly adapts to the new board state.
+  For the most part we see that there is a large spike in the number of moves played every 50 games (when the board changes) but it then quickly adapts to the new board state. This means that showing it the same board many times in a row leads it to optimize only for that board.
 
 ### Different game every time 
   Finally, we tried our system out on a different board every game. 
@@ -214,7 +214,7 @@ _The above shows the training results for a 3x3 grid with 1 food, discount facto
 
 ### Play with learning rate
 ####Constant vs decay
-To start exploring the effect of varying the learning rate we tested a variety on constant learning rates from .01 to 1. We found that for the 3 by 3 board with 1 food the optimal constant learning rate was .1. The results from this test are shown below.
+To start exploring the effect of varying the learning rate we tested a variety of constant learning rates from .01 to 1. We found that for the 3 by 3 board with 1 food the optimal constant learning rate was .1. The results from this test are shown below.
 ![](images/differentGame-3x3_1-constDF_0.5-Boltz-constER_0.2-constLR_0.1-eval.png "")
 _The above shows the evaluation results for a 3x3 grid with 1 food, discount factor of 0.5, temperature of 0.2, and a learning rate of 0.1._
 
@@ -226,7 +226,7 @@ _The above shows the evaluation results for a 3x3 grid with 1 food, discount fac
 The best parameters with a decaying learning rate allowed for the bot to learn faster initially but it appears that it the constant learning rate allowed the bot to reach consistently optimal performance earlier.
 
 ### Other game spaces (Multiple food)
-At the very end we were curious how it would preform with multiple food. The results indicate it does learn but does not reach optimal performance. Although it should be noted that we did not setup our system to optimize for the best route to eat all the food, but rather only how it can eat food the fastest. 
+At the very end we were curious how it would preform with multiple food. The results indicate it does learn but does not reach optimal performance. Although it should be noted that we did not setup our system to optimize for the best route to eat all the food, but rather only how it can eat a single food the fastest. 
 ![](images/sameGame-3x3_3-constDF_0.5-Boltz-constER_0.2-constLR_0.2-eval.png "")
 _The above shows the evaluation results for a 3x3 grid with 3 food, discount factor of 0.5, temperature of 0.2, and a learning rate of 0.2._
 
