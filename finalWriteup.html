@@ -53,7 +53,7 @@ Although we used a type of reinforcement learning called Q-learning in our proje
 ## Our initial Project
 For this project, we started out trying to create a bot for the online game [agar.io](agar.io). In this game, players are cells moving around an area trying to eat food other other players that are smaller than they are. To build our bot, we found an open-source implementation of the agar game, called [ogar](https://github.com/OgarProject/Ogar). In this node.js implementation we could control everything from the size of the playing area to the number of food that was in the playing area. We figured that it was best to start our reinforcement learning adventure by starting simple, so we created a relatively small board. Then we set about implementing our bot. This involved having the node server communicate with a python script that would do the reinforcement learning. Although we got the node-python communication working fairly quickly, and started work trying out a few reinforcement learning techniques (mostly least squares policy iteration) we eventually realized that there were a few problems with this setup: 
 
-**Reinforcement learning in a continuous space is difficult.** Since this game is played on pretty much a continuous area the state space is continuous, rather than being played on a grid. This means that there is a very large state space. What was more of a problem, though, was the action space was also continuous. In [agar.io][agar.io], players control their cells using the mouse, and the bot moves in the direction of the mouse. This means that in the case of our learning bot, an action would effectively be setting the mouse position of the "player" controlling the bot. A continuous action space is not something that is a solved problem in the reinforcement learning field, so we didn't think it was appropriately scoped project, for our first adventure with reinforcement learning.
+**Reinforcement learning in a continuous space is difficult.** Since this game is played on pretty much a continuous area the state space is continuous, rather than being played on a grid. This means that there is a very large state space. What was more of a problem, though, was the action space was also continuous. In [agar.io](agar.io), players control their cells using the mouse, and the bot moves in the direction of the mouse. This means that in the case of our learning bot, an action would effectively be setting the mouse position of the "player" controlling the bot. A continuous action space is not something that is a solved problem in the reinforcement learning field, so we didn't think it was appropriately scoped project, for our first adventure with reinforcement learning.
 
 **It was hard to see whether the bot was getting better.**  Although we had started to implement some reinforcement learning algorithms, we found that we had a lot of trouble figuring out if the bot was learning, or whether the bot just happened to be getting lucky doing a random walk. (A random walk is the bot moving across the board in a random way.) Solving this problem was particularly difficult because the ogar implementation interfaces with the [agar.io](agar.io) frontend, so we would basically have had to build our own frontend to get around this lack of information about how well our bot was learning.  
 
@@ -93,11 +93,9 @@ The information we're using to learn the Q function, in other words our training
 For the action we actually took from the state we were in, we update the predicted value of that move using the following equation:
 
 
-$$Q_{t+1}(s_t,a_t) = Q_t(s_t, a_t) + \alpha_t(s_t,a_t)\times$$
+$$Q_{t+1}(s_t,a_t) = Q_t(s_t, a_t) + \alpha_t(s_t,a_t)\times (R_{t+1} + \gamma \times max(Q_t(s_t+1,a))) - Q_t(s_t, a_t))$$
 
-$$(R_{t+1} + \gamma \times max(Q_t(s_t+1,a))) - Q_t(s_t, a_t))$$
-
-In other words, we adjust the value of the current state by our learning rate $\alpha_t$ multiplied by the sum of the reward, $R_{t+1}$, our discount factor, $\gamma$ times the predicted value of the best action from the new state, $max(Q_t(s_t+1,a)))$, and the negative old value $ Q_t(s_t, a_t)$. In other words, we bring the new value of the current state some amount closer to the value of the next state based on the equation above.
+In other words, we adjust the value of the current state by our learning rate $\alpha_t$ multiplied by the sum of the reward, $R_{t+1}$, our discount factor, $\gamma$ times the predicted value of the best action from the new state, $max(Q_t(s_t+1,a))$, and the negative old value $ Q_t(s_t, a_t)$. In other words, we bring the new value of the current state some amount closer to the value of the next state based on the equation above.
 
 We then feed this into the neural network to help it learn a better Q function. 
 
@@ -108,14 +106,16 @@ To combine the game, our reinforcement learning algorithm, and the neural networ
 
 ![](images/System_Diagram.png "")
 
-In this system diagram, we have color coded where in our code each part happens. The left-most column are all the steps that we go through. For steps with additional rectangles to the right, these rectangles provide more information based on how we're going about performing those steps. 
+In this system diagram, we have color coded where in our code each part happens. The left-most column are all the steps that we go through. For steps with additional rectangles to the right, these rectangles provide more information based on how we're going about performing those steps. These steps all the way on the left are the steps we perform in GridLearning/mainLoop.py. In this system diagram, there are some steps in our process that also have rectangles extending to the left. In these cases, these rectangles provide slightly more information about what we're actually doing in each of those steps.
+
+*To see how we've actually written the code to perform each of these steps, please consult GridLearning/mainLoop.py, GridLearning/game.py, GridLearning/rl.py, or GridLearning/nn.py.*
 
 
 ## Our Explorations
 
 * Learning to play 1 game (Story: We could learn to play any game, but we’re going to use games that take the least time to learn -- 3x3, 1 food)
-  * sameGame-3x3_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-training
-  * sameGame-4x4_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-training
+  * ![](images/sameGame-3x3_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-training.png "")
+  * ![](images/sameGame-4x4_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-training.png "")
 * Different Game every n games (Story: nice stepping stone  -- we can learn multiple games. This is fairly short. -- if this winds up not being interesting, let’s delete this)
   * ![](images/differentGameEvery50-3x3_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-eval.png "")
   * ![](images/differentGameEvery50-3x3_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-training.png "")
@@ -165,7 +165,7 @@ In this system diagram, we have color coded where in our code each part happens.
     * ![](images/differentGame-3x3_1-constDF_0.5-Boltz-constER_0.2-constLR_0.1-eval.png "")
     * ![](images/differentGame-3x3_1-constDF_0.5-Boltz-constER_0.2-decayLR_0.4_2000-eval.png "")
 * Other game spaces (Multiple food)
-  * differentGame-3x3_3-constDF_0.5-Boltz-decayER_0.2_1000-decayLR_0.9_1000-eval
+  * ![](images/sameGame-3x3_3-constDF_0.5-greedy-constER_0.2-constLR_0.1-eval.png "")
 
 
 
