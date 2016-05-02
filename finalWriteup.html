@@ -7,7 +7,7 @@
     <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen"><script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
 
 </head>
 <body>
@@ -20,9 +20,6 @@
       <a href="blogPost1.html" class="btn">Blog Post 1</a>
       <a href="blogPost2.html" class="btn">Blog Post 2</a>
     </section>
-
-<!-- <title>Project Proposal</title>
- -->
 <xmp  style="display:none;">
 # Final Writeup
 **Jacob, Mac-I, and Sophia**
@@ -94,9 +91,7 @@ The information we're using to learn the Q function, in other words our training
 For the action we actually took from the state we were in, we update the predicted value of that move using the following equation:
 
 
-$$Q_{t+1}(s_t,a_t) = Q_t(s_t, a_t) + \alpha_t(s_t,a_t)\times$$
-
-$$(R_{t+1} + \gamma \times max(Q_t(s_t+1,a))) - Q_t(s_t, a_t))$$
+$$Q_{t+1}(s_t,a_t) = Q_t(s_t, a_t) + \alpha_t(s_t,a_t)\times(R_{t+1} + \gamma \times max(Q_t(s_t+1,a)) - Q_t(s_t, a_t))$$
 
 In other words, we adjust the value of the current state by our learning rate $\alpha_t$ multiplied by the sum of the reward, $R_{t+1}$, our discount factor, $\gamma$ times the predicted value of the best action from the new state, $max(Q_t(s_t+1,a)))$, and the negative old value $ Q_t(s_t, a_t)$. In other words, we bring the new value of the current state some amount closer to the value of the next state based on the equation above.
 
@@ -158,5 +153,5 @@ In this system diagram, we have color coded where in our code each part happens.
 
 </xmp>
 
-<script src="http://strapdownjs.com/v/0.2/strapdown.js?mathjax=y"></script>
+<script src="http://cdn.ztx.io/strapdown/strapdown.min.js"></script>
 </html>
