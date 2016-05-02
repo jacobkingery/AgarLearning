@@ -7,7 +7,8 @@
     <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen"><script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+
 </head>
 <body>
   	<section class="page-header">
@@ -27,11 +28,13 @@
 **Jacob, Mac-I, and Sophia**
 
 ## Project Background
-For our final data science project, we were interested in learning about two different machine learning tools or techniques: reinforcement learning and neural networks. In other words, we were interested in teaching a computer how to do something using a neural network. Before we dive too deep into the technical details of our project, let’s explain both reinforcement learning and neural networks.
+For our final project for our data science course, we were interested in learning about reinforcement learning. Specifically, we were interested in teaching a computer how to play a game. The game we chose to learn how to play was a grid-based game that had a player move around the grid until they ate all of the food on the grid (we'll talk more about this game later!) To do this, we used a machine learning method called reinforcement learning. 
 
-### Reinforcement Learning
+### What is Reinforcement Learning?
 
 In most of the machine learning we’ve done in this course up until now, we were trying to learn a model that would allow us to predict the correct output given a set of previously collected inputs. While this is great if you already have a lot of data collected, this wasn’t the case for us. Since we were trying to teach a computer how to do something, in our case play a game, we didn’t have a dataset readily collected. As a result, we had two options. First, we could collect a dataset of us, or other people, playing a game, and teach the computer how to play a game. Our other option, reinforcement learning, was to let a computer teach itself how to play a game by seeing which actions have positive results and which have negative consequences. For a more in-depth explanation of a simple implementation of an example of reinforcement learning, please take a look at our [blog post!](http://jacobkingery.github.io/AgarLearning/blogPost1.html)
+
+#### Some important vocabulary
 
 Before we dive into the specifics of our exact problem setup and reinforcement learning implementation, let’s define some vocabulary! (These definitions are taken from our first blog post.)
 
@@ -48,29 +51,65 @@ Before we dive into the specifics of our exact problem setup and reinforcement l
 
 Although we used a type of reinforcement learning called Q-learning in our project, there are other approaches for reinforcement learning. For more information about other approaches to reinforcement learning and more information about reinforcement learning in general, check out one of our favorite resources [“Reinforcement Learning: An Introduction", by Richard Sutton and Andrew Barto](https://webdocs.cs.ualberta.ca/~sutton/book/the-book.html).
 
-### Neural Networks
-
 ## Our initial Project
-* what we wanted to do initially (agar.io)
-* what simplifications we made
-* why this was so, so complicated
-* also talk about that we couldn't see whether we were doing better than average
-* why we decided to switch -- and a reference to our blog post
+For this project, we started out trying to create a bot for the online game [agar.io](agar.io). In this game, players are cells moving around an area trying to eat food other other players that are smaller than they are. To build our bot, we found an open-source implementation of the agar game, called [ogar](https://github.com/OgarProject/Ogar). In this node.js implementation we could control everything from the size of the playing area to the number of food that was in the playing area. We figured that it was best to start our reinforcement learning adventure by starting simple, so we created a relatively small board. Then we set about implementing our bot. This involved having the node server communicate with a python script that would do the reinforcement learning. Although we got the node-python communication working fairly quickly, and started work trying out a few reinforcement learning techniques (mostly least squares policy iteration) we eventually realized that there were a few problems with this setup: 
 
-## Our Simple Setup
-Due to the struggles we had with our Agar.io reinforcement learning approach, we developed our own, simpler game. This game consisted of a gridded board of variable rectangular dimensions. Each square could contain a food, the bot, or nothing. We encoded 
+**Reinforcement learning in a continuous space is difficult.** Since this game is played on pretty much a continuous area the state space is continuous, rather than being played on a grid. This means that there is a very large state space. What was more of a problem, though, was the action space was also continuous. In [agar.io][agar.io], players control their cells using the mouse, and the bot moves in the direction of the mouse. This means that in the case of our learning bot, an action would effectively be setting the mouse position of the "player" controlling the bot. A continuous action space is not something that is a solved problem in the reinforcement learning field, so we didn't think it was appropriately scoped project, for our first adventure with reinforcement learning.
 
-### Our Sysem
-This section will contain a system digram and an explanation of how everything is related
-* talk about game
+**It was hard to see whether the bot was getting better.**  Although we had started to implement some reinforcement learning algorithms, we found that we had a lot of trouble figuring out if the bot was learning, or whether the bot just happened to be getting lucky doing a random walk. (A random walk is the bot moving across the board in a random way.) Solving this problem was particularly difficult because the ogar implementation interfaces with the [agar.io](agar.io) frontend, so we would basically have had to build our own frontend to get around this lack of information about how well our bot was learning.  
 
-* talk about Q learning
-  * talk about rl
-  * talk about neural network
+Although we could have certainly figured out ways to deal with these challenges, we were more interested in exploring how reinforcement learning and neural networks can be used together than we were in solving the particular problem of building the world's best [agar.io](agar.io) bot. As a result, we decided to simplify our game a little.
 
-* Talk about main loop
-  * show a system diagram
-  * talk about what we're doing
+## Our Simpler Game
+Due to the struggles we had with our Agar.io reinforcement learning approach, we developed our own, simpler game. This game consisted of a gridded board of variable rectangular dimensions. Each square could contain a food, the bot, or nothing. We encoded this information as a numpy matrix, where -1 meant that there was nothing in that cell, 0 meant that our bot was there, and 1 meant that there was food there. For example, one possible 3 by 3 game board looks like this
+
+```
+ 0 -1 -1
+-1  1 -1
+-1 -1 -1
+```
+
+In this case, the bot is at position 0,0, and there is a food at 1,1, while all the other cells are empty. In our game, the bot has four possible actions: move left, right, up, or down. If the bot tries to move into a wall, it simply does not move. The game ends when the bot has eaten all the food on the board. 
+
+*For more information about the implementation of our game, please consult the file GridLearning/game.py*
+
+### Our Reinforcement Learning Setup
+After simplifying our game, we also implemented our reinforcement learning setup. 
+
+In our case we used a relatively simple reinforcement learning method called Q-learning. This is a reinforcement learning method that learns the value, or Q, function. The computer uses the Q function to figure out which moves are the most advantageous. While in some simple cases, the Q function can just be a lookup table. In our case, however, we're using a neural network to learn the value function.
+
+If we were to use a table of state, action pairs mapping to a value, we would initialize our starting Q function to have some starting values. (For an example of using a table as the Q function, please take a look at our [first blog post](blogPost1.html)!)
+
+Then, we would play a bunch of games, and iteratively update our table so that the Q function more accurately reflects the actual value function of the game. 
+
+In our particular implementation, however, we're using a neural network to approximate the Q function. Before we dive too deep into how exactly this works, let's talk a bit about what a neural network actually is. 
+
+#### What is a Neural Network?
+THAT DEFINTION GOES HERE!!
+
+Okay, now that we've got an understanding about neural networks, let's talk about how exactly we're using them in our reinforcement learning setup. In our case, the input to the neural network is the state of the game, and we have four outputs; one for each action. The outputs correspond to the predicted value of performing that action based on the current state. 
+
+The information we're using to learn the Q function, in other words our training data, is a state and then a set of four values for each action. We collect, and update, this every time we make a move in our game. 
+
+For the action we actually took from the state we were in, we update the predicted value of that move using the following equation:
+
+$$Q_{t+1}(s_t,a_t) = Q_t(s_t, a_t) + \alpha_t(s_t,a_t)$$
+
+$$(R_{t+1} + \gamma max(Q_t(s_t+1,a))) - Q_t(s_t, a_t)$$
+
+HELP! THESE WON'T COMPILE TOGETHER in the same equation.
+
+In other words, we adjust the value of the current state by our learning rate $\alpha_t$ multiplied by the sum of the reward, $R_{t+1}$, our discount factor, $\gamma$ times the predicted value of the best action from the new state, $max(Q_t(s_t+1,a)))$, and the negative old value $ Q_t(s_t, a_t)$. In other words, we bring the new value of the current state some amount closer to the value of the next state based on the equation above.
+
+We then feed this into the neural network to help it learn a better Q function. 
+
+*For more information on exactly how we implemented the reinforcement learning and the neural network, please consult GridLearning/rl.py and GridLearning/nn.py, respectively.*
+
+### Putting it all together
+To combine the game, our reinforcement learning algorithm, and the neural network to do actual learning, we created a main loop (GridLearning/mainLoop.py) to handle us playing tons of games and having the computer learn from them. Our system diagram for this can be seen below:
+
+INSERT SYSTEM DIAGRAM HERE -- label this with functions of files?
+
 
 ## Our Explorations
 
@@ -108,5 +147,5 @@ This section will contain a system digram and an explanation of how everything i
 
 </xmp>
 
-<script src="http://strapdownjs.com/v/0.2/strapdown.js"></script>
+<script src="http://strapdownjs.com/v/0.2/strapdown.js?mathjax=y"></script>
 </html>
