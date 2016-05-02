@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
 <!--     <title>Agarlearning by jacobkingery</title>
  -->    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <!-- <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen"> -->
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
@@ -51,7 +51,7 @@ Although we used a type of reinforcement learning called Q-learning in our proje
 ## Our initial Project
 For this project, we started out trying to create a bot for the online game [agar.io](agar.io). In this game, players are cells moving around an area trying to eat food other other players that are smaller than they are. To build our bot, we found an open-source implementation of the agar game, called [ogar](https://github.com/OgarProject/Ogar). In this node.js implementation we could control everything from the size of the playing area to the number of food that was in the playing area. We figured that it was best to start our reinforcement learning adventure by starting simple, so we created a relatively small board. Then we set about implementing our bot. This involved having the node server communicate with a python script that would do the reinforcement learning. Although we got the node-python communication working fairly quickly, and started work trying out a few reinforcement learning techniques (mostly least squares policy iteration) we eventually realized that there were a few problems with this setup: 
 
-**Reinforcement learning in a continuous space is difficult.** Since this game is played on pretty much a continuous area the state space is continuous, rather than being played on a grid. This means that there is a very large state space. What was more of a problem, though, was the action space was also continuous. In [agar.io][agar.io], players control their cells using the mouse, and the bot moves in the direction of the mouse. This means that in the case of our learning bot, an action would effectively be setting the mouse position of the "player" controlling the bot. A continuous action space is not something that is a solved problem in the reinforcement learning field, so we didn't think it was appropriately scoped project, for our first adventure with reinforcement learning.
+**Reinforcement learning in a continuous space is difficult.** Since this game is played on pretty much a continuous area the state space is continuous, rather than being played on a grid. This means that there is a very large state space. What was more of a problem, though, was the action space was also continuous. In [agar.io](agar.io), players control their cells using the mouse, and the bot moves in the direction of the mouse. This means that in the case of our learning bot, an action would effectively be setting the mouse position of the "player" controlling the bot. A continuous action space is not something that is a solved problem in the reinforcement learning field, so we didn't think it was appropriately scoped project, for our first adventure with reinforcement learning.
 
 **It was hard to see whether the bot was getting better.**  Although we had started to implement some reinforcement learning algorithms, we found that we had a lot of trouble figuring out if the bot was learning, or whether the bot just happened to be getting lucky doing a random walk. (A random walk is the bot moving across the board in a random way.) Solving this problem was particularly difficult because the ogar implementation interfaces with the [agar.io](agar.io) frontend, so we would basically have had to build our own frontend to get around this lack of information about how well our bot was learning.  
 
@@ -82,7 +82,7 @@ Then, we would play a bunch of games, and iteratively update our table so that t
 In our particular implementation, however, we're using a neural network to approximate the Q function. Before we dive too deep into how exactly this works, let's talk a bit about what a neural network actually is. 
 
 #### What is a Neural Network?
-THAT DEFINTION GOES HERE!!
+THAT DEFINITION GOES HERE!!
 
 Okay, now that we've got an understanding about neural networks, let's talk about how exactly we're using them in our reinforcement learning setup. In our case, the input to the neural network is the state of the game, and we have four outputs; one for each action. The outputs correspond to the predicted value of performing that action based on the current state. 
 
@@ -93,7 +93,7 @@ For the action we actually took from the state we were in, we update the predict
 
 $$Q_{t+1}(s_t,a_t) = Q_t(s_t, a_t) + \alpha_t(s_t,a_t)\times(R_{t+1} + \gamma \times max(Q_t(s_t+1,a)) - Q_t(s_t, a_t))$$
 
-In other words, we adjust the value of the current state by our learning rate $\alpha_t$ multiplied by the sum of the reward, $R_{t+1}$, our discount factor, $\gamma$ times the predicted value of the best action from the new state, $max(Q_t(s_t+1,a)))$, and the negative old value $ Q_t(s_t, a_t)$. In other words, we bring the new value of the current state some amount closer to the value of the next state based on the equation above.
+In other words, we adjust the value of the current state by our learning rate $\alpha_t$ multiplied by the sum of the reward, $R_{t+1}$, our discount factor, $\gamma$ times the predicted value of the best action from the new state, $max(Q_t(s_t+1,a))$, and the negative old value $ Q_t(s_t, a_t)$. In other words, we bring the new value of the current state some amount closer to the value of the next state based on the equation above.
 
 We then feed this into the neural network to help it learn a better Q function. 
 
@@ -104,7 +104,9 @@ To combine the game, our reinforcement learning algorithm, and the neural networ
 
 ![](images/System_Diagram.png "")
 
-In this system diagram, we have color coded where in our code each part happens. The left-most column are all the steps that we go through. For steps with additional rectangles to the right, these rectangles provide more information based on how we're going about performing those steps. 
+In this system diagram, we have color coded where in our code each part happens. The left-most column are all the steps that we go through. (These are what gets called from GridLearning/mainLoop.py.) For steps with additional rectangles to the right, these rectangles provide more information based on how we're going about performing those steps. 
+
+*To see what's happening in our code for each of these steps, please consult GridLearning/game.py, GridLearning/rl.py, GridLearning/nn.py, or GridLearning/mainLoop.py.*
 
 
 ## Our Explorations
