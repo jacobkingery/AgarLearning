@@ -2,8 +2,21 @@ import numpy as np
 import random
 
 class ReinforcementQLearning:
+	"""
+    Class for a reinforcement q learning
+    """
 	def __init__(self, neuralNet, numberOfActions, exploratoryRateFn, backpropLength, discountFactorFn, learningRateFn, randomSeed=random.random()):
-		# Learning rate of 1 is optimal for deterministic environments
+		        """
+        Initializes Class
+        Inputs:
+            neuralNet  		  - A nueral net (as defined in nn.py)
+            numberOfActions   - number of possible actions
+            exploratoryRateFn - function that determines the exploratory rate
+            backpropLength    - currently unsed, sets how far back rewards propogate
+            discountFactorFn  - function that determines the discount factor
+            learningRateFn	  - function that determines the learning rate
+            randomSeed		  - random seed
+        """
 		random.seed(randomSeed)
 		self.neuralNet = neuralNet
 		self.numberOfActions = numberOfActions
@@ -16,6 +29,14 @@ class ReinforcementQLearning:
 		self.currentSAVRSAVIndex = 0
 
 	def getAction(self, state, i=0, evaluation=False, useB = True):
+		"""
+        Returns an action given the state of the game
+        Inputs:
+            state - current game state
+            i - iterations completed
+            evaluation - whether to always return the best move
+            useB - whether to use boltzman's distribution for selecting exploratory moves
+        """
 		exploratoryRate = self.exploratoryRateFn(i)
 		
 		
@@ -43,12 +64,24 @@ class ReinforcementQLearning:
 			return self.getBestActionValuePair(state)[0], False
 
 	def getBestActionValuePair(self, state):
+		"""
+        Returns the best action and it's value (as determined by the nueral net)
+        Inputs:
+            state - current game state
+        """
 		actionValuePairs = self.neuralNet.getValues(state)
 		bestAction = np.argmax(actionValuePairs)
 		return (bestAction, actionValuePairs[bestAction])
 
 	def storeSARS(self, state, action, reward, newState):
-		# stateBestActionValuePair = self.getBestActionValuePair(state)
+		"""
+        Stores the state, action, reward, newState tuple
+        Inputs:
+            state - previous game state
+            action - the action taken
+            reward - the reward recieved
+            newState - new game state
+        """
 		newStateBestActionValuePair = self.getBestActionValuePair(newState)
 		SAVRSAVdict = {'state': state,
 					   'action': action,
@@ -61,6 +94,11 @@ class ReinforcementQLearning:
 		return SAVRSAVdict
 
 	def train(self, i):
+		"""
+        Trains the neural network on all new stored state, action, reward, newState tuples
+        Inputs:
+            i - iterations completed
+        """
 		learningRate = self.learningRateFn(i)
 		discountFactor = self.discountFactorFn(i)
 		trainingTuples = []
@@ -70,36 +108,3 @@ class ReinforcementQLearning:
 			trainingTuples.append((currentSAVRSAV['state'],currentSAVRSAV['action'],value))
 			self.currentSAVRSAVIndex += 1
 		return self.neuralNet.train(trainingTuples)
-
-	def backprop(self):
-		pass
-
-if __name__ == "__main__":
-	class DumbNeuralNet:
-		def getValues(self, state):
-			return [random.random() for _ in range(4)]
-
-		def train(self, trainingTuples):
-			# print trainingTuples
-			return True
-
-	exampleState1 = [0,0,0,0]
-	exampleState2 = [1,1,1,1]
-	neuralNet = DumbNeuralNet()
-	numberOfActions = 4
-	backpropLength = 0
-	
-	def expRate(i):
-		return 0.3
-	def discountFactor(i):
-		return 0.5
-	def learningRate(i):
-		return 1
-
-	qRL = ReinforcementQLearning(neuralNet, numberOfActions, expRate, backpropLength, discountFactor, learningRate)
-	i = 0
-	print qRL.getAction(exampleState1, i)
-	print qRL.storeSARS(exampleState1, 1, 2, exampleState2)
-	print qRL.storeSARS(exampleState2, 3, 0, exampleState1)
-	print qRL.train(i)
-	
