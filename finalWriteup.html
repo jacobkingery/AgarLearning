@@ -93,11 +93,10 @@ The information we're using to learn the Q function, in other words our training
 
 For the action we actually took from the state we were in, we update the predicted value of that move using the following equation:
 
-$$Q_{t+1}(s_t,a_t) = Q_t(s_t, a_t) + \alpha_t(s_t,a_t)$$
 
-$$(R_{t+1} + \gamma max(Q_t(s_t+1,a))) - Q_t(s_t, a_t)$$
+$$Q_{t+1}(s_t,a_t) = Q_t(s_t, a_t) + \alpha_t(s_t,a_t)\times$$
 
-HELP! THESE WON'T COMPILE TOGETHER in the same equation.
+$$(R_{t+1} + \gamma \times max(Q_t(s_t+1,a))) - Q_t(s_t, a_t))$$
 
 In other words, we adjust the value of the current state by our learning rate $\alpha_t$ multiplied by the sum of the reward, $R_{t+1}$, our discount factor, $\gamma$ times the predicted value of the best action from the new state, $max(Q_t(s_t+1,a)))$, and the negative old value $ Q_t(s_t, a_t)$. In other words, we bring the new value of the current state some amount closer to the value of the next state based on the equation above.
 
@@ -108,7 +107,9 @@ We then feed this into the neural network to help it learn a better Q function.
 ### Putting it all together
 To combine the game, our reinforcement learning algorithm, and the neural network to do actual learning, we created a main loop (GridLearning/mainLoop.py) to handle us playing tons of games and having the computer learn from them. Our system diagram for this can be seen below:
 
-INSERT SYSTEM DIAGRAM HERE -- label this with functions of files?
+![](images/System_Diagram.png "")
+
+In this system diagram, we have color coded where in our code each part happens. The left-most column are all the steps that we go through. For steps with additional rectangles to the right, these rectangles provide more information based on how we're going about performing those steps. 
 
 
 ## Our Explorations
