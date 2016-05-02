@@ -226,7 +226,12 @@ _The above shows the evaluation results for a 3x3 grid with 1 food, discount fac
 The best parameters with a decaying learning rate allowed for the bot to learn faster initially but it appears that it the constant learning rate allowed the bot to reach consistently optimal performance earlier.
 
 ### Other game spaces (Multiple food)
-![](images/sameGame-3x3_3-constDF_0.5-greedy-constER_0.2-constLR_0.1-eval.png "")
+At the very end we were curious how it would preform with multiple food. The results indicate it does learn but does not reach optimal performance. Although it should be noted that we did not setup our system to optimize for the best route to eat all the food, but rather only how it can eat food the fastest. 
+![](images/sameGame-3x3_3-constDF_0.5-Boltz-constER_0.2-constLR_0.2-eval.png "")
+_The above shows the evaluation results for a 3x3 grid with 3 food, discount factor of 0.5, temperature of 0.2, and a learning rate of 0.2._
+
+![](images/sameGame-3x3_3-constDF_0.5-Boltz-constER_0.2-constLR_0.2-training.png "")
+_The above shows the training results for a 3x3 grid with 3 food, discount factor of 0.5, temperature of 0.2, and a learning rate of 0.2._
 
 
 
