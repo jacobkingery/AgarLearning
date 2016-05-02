@@ -127,7 +127,7 @@ In this system diagram, we have color coded where in our code each part happens.
   * $\epsilon$-greedy
 
       One method of choosing which action to take is known as $\epsilon$-greedy, which selects the action with the highest value with probability $(1 - \epsilon)$ and a random action with probability $\epsilon$.
-      We explored different values of $\epsilon$, both constant and changing over time.
+      We explored different values of $\epsilon$, or exploratory rate, both constant and changing over time.
     
       ![](images/differentGame-3x3_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-eval.png "")
 
@@ -142,10 +142,20 @@ In this system diagram, we have color coded where in our code each part happens.
 
   * Soft-max
   
-      Another method of action selection that we tried uses a soft-max with a Boltzmann distribution. This chooses the action with probabilities of $(e^{Q[s,a]/T})/(\sum_{a} e^{Q[s,a]/T})$
+      Another method of action selection that we tried uses a soft-max with a Boltzmann distribution. This chooses the action with probabilities of $(e^{Q[s,a]/T})/(\sum_{a} e^{Q[s,a]/T})$ where $Q[s,a]$ is the value for a given state-action pair and $T$ is the "temperature", or how randomly it should choose actions.
+      We explored different values of $T$, both constant and changing over time.
     
       ![](images/differentGame-3x3_1-constDF_0.5-Boltz-constER_0.2-constLR_0.9-eval.png "")
-      ![](images/differentGame-3x3_1-constDF_0.5-Boltz-decayER_0.2_2000-constLR_0.9-eval.png "") We got very lucky, both .19 and .21 hung
+
+      _The above shows the evaluation results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and temperature of 0.2._
+
+      ![](images/differentGame-3x3_1-constDF_0.5-Boltz-decayER_0.2_2000-constLR_0.9-eval.png "")
+
+      _The above shows the evaluation results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and temperature decaying from 0.2 with a time constant of 2000 games._
+
+      Using a fixed discount factor and learning rate, the best constant temperature we found was also 0.2. Also like in $\epsilon$-greedy, using an exponential decay function was better than holding the temperature constant. Here, a starting value of 0.5 and a time constant of 2000 games learned the fastest.
+      Something worth noting is that changing the starting value to 0.19 or 0.21 caused it to get stuck during a game a few thousand games in. We think this is due to the temperature dropping too low and not allowing it to move randomly when it needs to explore more. It appears that we were lucky with the starting value of 0.2.
+
   * summary/conclusions
     * Overall spikes are lower with boltzmann
       * ![](images/differentGame-3x3_1-constDF_0.5-greedy-decayER_0.5_5000-constLR_0.9-training.png "")
