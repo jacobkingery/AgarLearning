@@ -68,7 +68,7 @@ Due to the struggles we had with our Agar.io reinforcement learning approach, we
 -1 -1 -1
 ```
 
-In this case, the bot is at position 0,0, and there is a food at 1,1, while all the other cells are empty. In our game, the bot has four possible actions: move left, right, up, or down. If the bot tries to move into a wall, it simply does not move. The game ends when the bot has eaten all the food on the board. 
+In this case, the bot is at position (0,0), and there is a food at (1,1), while all the other cells are empty. In our game, the bot has four possible actions: move left, right, up, or down. If the bot tries to move into a wall, it simply does not move. The game ends when the bot has eaten all the food on the board. 
 
 *For more information about the implementation of our game, please consult the file GridLearning/game.py*
 
@@ -160,7 +160,7 @@ In this system diagram, we have color coded where in our code each part happens.
 
 * Focus on different game every time
 * Action Selection
-  * $\epsilon$-greedy
+    #### $\epsilon$-greedy
 
       One method of choosing which action to take is known as $\epsilon$-greedy, which selects the action with the highest value with probability $(1 - \epsilon)$ and a random action with probability $\epsilon$.
       We explored different values of $\epsilon$, or exploratory rate, both constant and changing over time.
@@ -176,7 +176,7 @@ In this system diagram, we have color coded where in our code each part happens.
       Using a fixed discount factor and learning rate, the best constant exploratory rate we found was 0.2. This means that each time we make a move (unless we're evaluating), there is a 20% chance of taking a random action instead of choosing the action with the greatest value predicted by the neural network.
       We also looked at decreasing the exploratory rate each game using an exponential decay function.  The best parameters we found for this were a starting value of 0.5 and a time constant of 5000 games.  This appears to be better than the constant exploratory rate; it learns optimal play faster using the decaying exploratory rate.
 
-  * Soft-max
+    #### Soft-max
   
       Another method of action selection that we tried uses a soft-max with a Boltzmann distribution. This chooses the action with probabilities of $(e^{Q[s,a]/T})/(\sum_{a} e^{Q[s,a]/T})$ where $Q[s,a]$ is the value for a given state-action pair and $T$ is the "temperature", or how randomly it should choose actions.
       We explored different values of $T$, both constant and changing over time.
@@ -192,10 +192,18 @@ In this system diagram, we have color coded where in our code each part happens.
       Using a fixed discount factor and learning rate, the best constant temperature we found was also 0.2. Also like in $\epsilon$-greedy, using an exponential decay function was better than holding the temperature constant. Here, a starting value of 0.5 and a time constant of 2000 games learned the fastest.
       Something worth noting is that changing the starting value to 0.19 or 0.21 caused it to get stuck during a game a few thousand games in. We think this is due to the temperature dropping too low and not allowing it to move randomly when it needs to explore more. It appears that we were lucky with the starting value of 0.2.
 
-  * summary/conclusions
-    * Overall spikes are lower with boltzmann
-      * ![](images/differentGame-3x3_1-constDF_0.5-greedy-decayER_0.5_5000-constLR_0.9-training.png "")
-      * ![](images/differentGame-3x3_1-constDF_0.5-Boltz-constER_0.2-constLR_0.9-training.png "")
+    #### Conclusion
+
+      Overall, it seems that the soft-max action selection is better than the $\epsilon$-greedy method. It learns faster and better, having smaller spikes later on when not evaluating (shown below, note the ranges of the y-axes).
+
+      ![](images/differentGame-3x3_1-constDF_0.5-greedy-decayER_0.5_5000-constLR_0.9-training.png "")
+
+      _The above shows the training results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and exploratory rate decaying from 0.5 with a time constant of 5000 games._
+
+      ![](images/differentGame-3x3_1-constDF_0.5-Boltz-constER_0.2-constLR_0.9-training.png "")
+
+      _The above shows the training results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and temperature of 0.2._
+
 * Play with learning rate
   * Constant vs decay
     * ![](images/differentGame-3x3_1-constDF_0.5-Boltz-constER_0.2-constLR_0.1-eval.png "")
