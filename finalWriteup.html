@@ -95,7 +95,7 @@ For the action we actually took from the state we were in, we update the predict
 
 $$Q_{t+1}(s_t,a_t) = Q_t(s_t, a_t) + \alpha_t(s_t,a_t)\times (R_{t+1} + \gamma \times max(Q_t(s_t+1,a))) - Q_t(s_t, a_t))$$
 
-In other words, we adjust the value of the current state by our learning rate $\alpha_t$ multiplied by the sum of the reward, $R_{t+1}$, our discount factor, $\gamma$ times the predicted value of the best action from the new state, $max(Q_t(s_t+1,a)))$, and the negative old value $ Q_t(s_t, a_t)$. In other words, we bring the new value of the current state some amount closer to the value of the next state based on the equation above.
+In other words, we adjust the value of the current state by our learning rate $\alpha_t$ multiplied by the sum of the reward, $R_{t+1}$, our discount factor, $\gamma$ times the predicted value of the best action from the new state, $max(Q_t(s_t+1,a))$, and the negative old value $ Q_t(s_t, a_t)$. In other words, we bring the new value of the current state some amount closer to the value of the next state based on the equation above.
 
 We then feed this into the neural network to help it learn a better Q function. 
 
