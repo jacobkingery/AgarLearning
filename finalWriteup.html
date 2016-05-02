@@ -33,7 +33,7 @@ For our final project for our data science course, we were interested in learnin
 
 In most of the machine learning we’ve done in this course up until now, we were trying to learn a model that would allow us to predict the correct output given a set of previously collected inputs. While this is great if you already have a lot of data collected, this wasn’t the case for us. Since we were trying to teach a computer how to do something, in our case play a game, we didn’t have a dataset readily collected. As a result, we had two options. First, we could collect a dataset of us, or other people, playing a game, and teach the computer how to play a game. Our other option, reinforcement learning, was to let a computer teach itself how to play a game by seeing which actions have positive results and which have negative consequences. For a more in-depth explanation of a simple implementation of an example of reinforcement learning, please take a look at our [blog post!](http://jacobkingery.github.io/AgarLearning/blogPost1.html)
 
-#### Some important vocabulary
+#### Some Important Vocabulary
 
 Before we dive into the specifics of our exact problem setup and reinforcement learning implementation, let’s define some vocabulary! (These definitions are taken from our first blog post.)
 
@@ -50,7 +50,7 @@ Before we dive into the specifics of our exact problem setup and reinforcement l
 
 Although we used a type of reinforcement learning called Q-learning in our project, there are other approaches for reinforcement learning. For more information about other approaches to reinforcement learning and more information about reinforcement learning in general, check out one of our favorite resources [“Reinforcement Learning: An Introduction", by Richard Sutton and Andrew Barto](https://webdocs.cs.ualberta.ca/~sutton/book/the-book.html).
 
-## Our initial Project
+## Our Initial Project
 For this project, we started out trying to create a bot for the online game [agar.io](agar.io). In this game, players are cells moving around an area trying to eat food other other players that are smaller than they are. To build our bot, we found an open-source implementation of the agar game, called [ogar](https://github.com/OgarProject/Ogar). In this node.js implementation we could control everything from the size of the playing area to the number of food that was in the playing area. We figured that it was best to start our reinforcement learning adventure by starting simple, so we created a relatively small board. Then we set about implementing our bot. This involved having the node server communicate with a python script that would do the reinforcement learning. Although we got the node-python communication working fairly quickly, and started work trying out a few reinforcement learning techniques (mostly least squares policy iteration) we eventually realized that there were a few problems with this setup: 
 
 **Reinforcement learning in a continuous space is difficult.** Since this game is played on pretty much a continuous area the state space is continuous, rather than being played on a grid. This means that there is a very large state space. What was more of a problem, though, was the action space was also continuous. In [agar.io](agar.io), players control their cells using the mouse, and the bot moves in the direction of the mouse. This means that in the case of our learning bot, an action would effectively be setting the mouse position of the "player" controlling the bot. A continuous action space is not something that is a solved problem in the reinforcement learning field, so we didn't think it was appropriately scoped project, for our first adventure with reinforcement learning.
@@ -84,7 +84,15 @@ Then, we would play a bunch of games, and iteratively update our table so that t
 In our particular implementation, however, we're using a neural network to approximate the Q function. Before we dive too deep into how exactly this works, let's talk a bit about what a neural network actually is. 
 
 #### What is a Neural Network?
-THAT DEFINTION GOES HERE!!
+A neural network is a machine learning model that is inspired by biological nervous systems. It is composed of layers of neurons that are connected as a network. The image below shows a very simple neural network with three inputs and two outputs. The layer of neurons in the middle is referred to as a 'hidden layer', and there can be any number of hidden layers in a neural network.
+
+![](https://upload.wikimedia.org/wikipedia/commons/4/46/Colored_neural_network.svg "")
+
+_Neural network with three inputs, one hidden layer with four neurons, and two outputs; image from https://en.wikipedia.org/wiki/File:Colored_neural_network.svg_
+
+Each neuron takes in each of the outputs of the previous layer, multiplies them by weights, adds a bias, and passes them through an activation function (such as a [hyperbolic tangent](http://mathworld.wolfram.com/HyperbolicTangent.html) or [sigmoid function](http://mathworld.wolfram.com/SigmoidFunction.html)) to each of the neurons in the next layer. The number of hidden layers, number of neurons in each layer, and activation functions between the layers are all set by the designer of the neural network (in this case, us!).
+
+Like other machine learning models, neural networks need to be trained. By comparing the outputs of the neural network to 'correct' results, the error can be minimized using an optimization technique such as gradient descent.
 
 Okay, now that we've got an understanding about neural networks, let's talk about how exactly we're using them in our reinforcement learning setup. In our case, the input to the neural network is the state of the game, and we have four outputs; one for each action. The outputs correspond to the predicted value of performing that action based on the current state. 
 
