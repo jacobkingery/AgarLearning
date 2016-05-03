@@ -31,24 +31,23 @@ For our final project for our data science course, we were interested in learnin
 
 ### What is Reinforcement Learning?
 
-In most of the machine learning we’ve done in this course up until now, we were trying to learn a model that would allow us to predict the correct output given a set of previously collected inputs. While this is great if you already have a lot of data collected, this wasn’t the case for us. Since we were trying to teach a computer how to do something, in our case play a game, we didn’t have a dataset readily collected. As a result, we had two options. First, we could collect a dataset of us, or other people, playing a game, and teach the computer how to play a game. Our other option, reinforcement learning, was to let a computer teach itself how to play a game by seeing which actions have positive results and which have negative consequences. For a more in-depth explanation of a simple implementation of an example of reinforcement learning, please take a look at our [blog post!](http://jacobkingery.github.io/AgarLearning/blogPost1.html)
+In most of the machine learning we’ve done in this course up until now, we were trying to learn a model that would allow us to predict the correct output given a set of previously collected inputs. While this is great if you already have a lot of data collected, this wasn’t the case for us. Since we were trying to teach a computer how to do something, in our case play a game, we didn’t have a dataset readily collected. As a result, we had two options. First, we could collect a dataset of us, or other people, playing a game, and teach the computer how to play a game by learning how we played the game. Our other option, reinforcement learning, was to let a computer teach itself how to play a game by seeing which actions have positive results and which have negative consequences. For a more in-depth explanation of a simple implementation of an example of reinforcement learning, please take a look at our [first blog post!](http://jacobkingery.github.io/AgarLearning/blogPost1.html)
 
 #### Some Important Vocabulary
 
 Before we dive into the specifics of our exact problem setup and reinforcement learning implementation, let’s define some vocabulary! (These definitions are taken from our first blog post.)
 
-**State (s):** We define the state as everything the computer currently knows about what is happening. 
+**State ($s$):** We define the state as everything the computer currently knows about what is happening. 
 
-**Action (a):** Although this is fairly self-explanatory,an action is anything that a computer can do when the game is in a certain state.
+**Action ($a$):** Although this is fairly self-explanatory,an action is anything that a computer can do when the game is in a certain state.
 
-**Policy (π):** Our policy is a function that defines how the computer behaves at any given point in time.
+**Policy ($\pi$):** Our policy is a function that defines how the computer behaves at any given point in time.
 
-**Reward function:** The reward function tells the computer, that, given a certain state-action pair the reward for performing that action, given the current state. This reward is determined based on how desirable the result of performing a given action from a given state is. The reward of transitioning from state s to state s' given action a is normally written as r(s,a,s')
+**Reward function:** The reward function tells the computer, that, given a certain state-action pair the reward for performing that action, given the current state. This reward is determined based on how desirable the result of performing a given action from a given state is. The reward of transitioning from state s to state $s'$ given action $a$ is normally written as $r(s,a,s')$
 
-**Value function:** Although some state, action pairs might have a good immediate outcome, they might not be as desirable in the long-term. The value function seeks to predict the long-term desirability of a state action pair. The predicted value of a given state under policy π, is written as vπ(s), while the value of state s and taking action a is written as qπ(s,a).
+**Value function:** Although some state, action pairs might have a good immediate outcome, they might not be as desirable in the long-term. The value function seeks to predict the long-term desirability of a state action pair. The predicted value of a given state under policy $\pi$, is written as $v_π(s)$, while the value of state s and taking action a is written as $q_π(s,a)$.
 
-
-Although we used a type of reinforcement learning called Q-learning in our project, there are other approaches for reinforcement learning. For more information about other approaches to reinforcement learning and more information about reinforcement learning in general, check out one of our favorite resources [“Reinforcement Learning: An Introduction", by Richard Sutton and Andrew Barto](https://webdocs.cs.ualberta.ca/~sutton/book/the-book.html).
+Although we used a type of reinforcement learning called Q-learning in our project, there are other approaches for reinforcement learning. For more information about other approaches to reinforcement learning and more information about reinforcement learning in general, check out one of our favorite resources: [“Reinforcement Learning: An Introduction", by Richard Sutton and Andrew Barto](https://webdocs.cs.ualberta.ca/~sutton/book/the-book.html).
 
 ## Our Initial Project
 For this project, we started out trying to create a bot for the online game [agar.io](agar.io). In this game, players are cells moving around an area trying to eat food other other players that are smaller than they are. To build our bot, we found an open-source implementation of the agar game, called [ogar](https://github.com/OgarProject/Ogar). In this node.js implementation we could control everything from the size of the playing area to the number of food that was in the playing area. We figured that it was best to start our reinforcement learning adventure by starting simple, so we created a relatively small board. Then we set about implementing our bot. This involved having the node server communicate with a python script that would do the reinforcement learning. Although we got the node-python communication working fairly quickly, and started work trying out a few reinforcement learning techniques (mostly least squares policy iteration) we eventually realized that there were a few problems with this setup: 
@@ -62,7 +61,7 @@ Although we could have certainly figured out ways to deal with these challenges,
 ## Our Simpler Game
 Due to the struggles we had with our Agar.io reinforcement learning approach, we developed our own, simpler game. This game consisted of a gridded board of variable rectangular dimensions. Each square could contain a food, the bot, or nothing. We encoded this information as a numpy matrix, where -1 meant that there was nothing in that cell, 0 meant that our bot was there, and 1 meant that there was food there. For example, one possible 3 by 3 game board looks like this
 
-```
+``` python
  0 -1 -1
 -1  1 -1
 -1 -1 -1
@@ -94,14 +93,13 @@ Each neuron takes in each of the outputs of the previous layer, multiplies them 
 
 Like other machine learning models, neural networks need to be trained. By comparing the outputs of the neural network to 'correct' results, the error can be minimized using an optimization technique such as gradient descent.
 
-Now that we've got an understanding about neural networks, let's talk about how exactly we're using them in our reinforcement learning setup. In our case, the input to the neural network is the state of the game, and we have four outputs; one for each action. The outputs correspond to the predicted value of performing that action based on the current state. 
+Now that we've got an understanding about neural networks, let's talk about how exactly we're using them in our reinforcement learning setup. In our case, the input to the neural network is the state of the game, and we have four outputs; one for each action. The outputs correspond to the predicted value of performing that action based on the current state. If you remember our description of reinforcement learning above, you'll remember that we said that the inputs of the value function are the state and the action. We've deviated a little from that here in that our inputs are the state and our outputs our four values, one for each action. For whatever reason, we've found that this appears to help the computer learn our game faster. (To see examples, check out [blog post 2](blogPost2.html)!)
 
 The information we're using to learn the Q function, in other words our training data, is a state and then a set of four values for each action. We collect, and update, this every time we make a move in our game. 
 
 For the action we actually took from the state we were in, we update the predicted value of that move using the following equation:
 
-
-$$Q_{t+1}(s_t,a_t) = Q_t(s_t, a_t) + \alpha_t(s_t,a_t)\times (R_{t+1} + \gamma \times max(Q_t(s_t+1,a))) - Q_t(s_t, a_t))$$
+$$Q_{t+1}(s_t,a_t) = Q_t(s_t, a_t) + \alpha_t(s_t,a_t)\times (R_{t+1} + \gamma \times max(Q_t(s_t+1,a)) - Q_t(s_t, a_t))$$
 
 In other words, we adjust the value of the current state by our learning rate $\alpha_t$ multiplied by the sum of the reward, $R_{t+1}$, our discount factor, $\gamma$ times the predicted value of the best action from the new state, $max(Q_t(s_t+1,a))$, and the negative old value $ Q_t(s_t, a_t)$. In other words, we bring the new value of the current state some amount closer to the value of the next state based on the equation above.
 
@@ -124,20 +122,20 @@ In this system diagram, we have color coded where in our code each part happens.
 ### Learning to play 1 game
   In order to confirm that our reinforcement learning system could in fact learn we choose to test it out on learning a single board configuration. The board we started to train on looked like this:
 
-  ```
+  ``` python
    0 -1 -1
   -1 -1 -1
   -1  1 -1
   ```
 
-  We can see that the optimal number of moves to eat the food is 3. Here are our training results:
+  From the board above, we can see that the optimal number of moves to eat the food is 3. Here are our training results:
 
   ![](images/sameGame-3x3_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-training.png "")
     _The above shows the training results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and exploratory rate of 0.2 running on the same board every time._
 
   Our training results graph shows the number of moves it took the bot to eat all the food in every game it played while training. We also show the running average for the last 100 games. In the results above we see that it learned to eat the food in 3 moves after only 6 games. Pretty Good! Now let's see how it performs on a larger board. Here we tested it on a 4 by 4 board:
 
-  ```
+  ``` python
    0 -1 -1 -1
   -1 -1 -1  1
   -1 -1 -1 -1
@@ -148,10 +146,10 @@ In this system diagram, we have color coded where in our code each part happens.
   ![](images/sameGame-4x4_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-training.png "")
      _The above shows the training results for a 4x4 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and exploratory rate of 0.2 running on the same board every time._
 
-  It definitely took longer to learn to eat the food on the 4 by 4 board but it did learn to eat the food in 4 moves in less than 100 games.
+  It definitely took longer to learn to eat the food on the 4 by 4 board but it did learn to eat the food in 4 moves in less than 100 games. It's also worth noting in these graphs that we have exploratory behavior turned on so that the bot can learn how to play the game in the first place. Later on, we'll show graphs with the exploratory behavior turned off.
 
 ### Different game every n games 
-  Before diving straight into a different board every game we choose to examine what would happen if we switched the boards every 50 games. The below figure shows our evaluation graph for this scenario. Our evaluation graphs were created by testing the bot on every possible board every 50 games. For example in the 3 by 3 case with 1 food there are 8 possible boards, in the 3 by 3 case with 2 foods there are 28 possible boards. For each board we allowed the bot 100 moves to eat all the food. If it hadn't completed the game in that length of time we knew it was impossible (on this size board) for complete the game. We then plot the mean number of moves it took that bot to complete all the possible boards. 
+  Before diving straight into a different board every game we choose to examine what would happen if we switched the boards every 50 games. The below figure shows our evaluation graph for this scenario. Our evaluation graphs were created by testing the bot on every possible board every 50 games and disabling exploratory behavior for the evaluation period. For example in the 3 by 3 case with 1 food there are 8 possible boards, in the 3 by 3 case with 2 foods there are 28 possible boards. For each board we allowed the bot 100 moves to eat all the food. If it hadn't completed the game in that length of time we knew it was impossible (on this size board) for it to complete the game. This is because in these cases, the bot hasn't learned how to play this particular game, or hasn't generalized and winds up moving back and forth indefinitely. We then plot the mean number of moves it took that bot to complete all the possible boards for each exploratory period. 
 
   ![](images/differentGameEvery50-3x3_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-eval.png "")
     _The above shows the evaluation results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and exploratory rate of 0.2 running on a different board every 50 games._
@@ -169,7 +167,7 @@ In this system diagram, we have color coded where in our code each part happens.
   ![](images/differentGame-3x3_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-eval.png "")
     _The above shows the evaluation results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and exploratory rate of 0.2 running on a different board every game._
 
-  In the above graph we can see that it is learning to eat the food better and better the more games is plays. Toward the end it is even playing the games perfectly most of the time. Let's take a look at our training graph.
+  In the above graph we can see that it is learning to eat the food better and better the more games is plays. Toward the end it is even playing the games perfectly much of the time. Let's take a look at our training graph.
 
   ![](images/differentGame-3x3_1-constDF_0.5-greedy-constER_0.2-constLR_0.9-training.png "")
     _The above shows the training results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and exploratory rate of 0.2 running on a different board every game._
@@ -194,7 +192,8 @@ We also looked at decreasing the exploratory rate each game using an exponential
 
 #### Soft-max
   
-Another method of action selection that we tried uses a soft-max with a Boltzmann distribution. This chooses the action with probabilities of $(e^{Q[s,a]/T})/(\sum_{a} e^{Q[s,a]/T})$ where $Q[s,a]$ is the value for a given state-action pair and $T$ is the "temperature", or how randomly it should choose actions.
+Another method of action selection that we tried uses a soft-max with a Boltzmann distribution. This chooses the action with probabilities of $(e^{Q[s,a]/T})/(\sum_{a} e^{Q[s,a]/T})$ where $Q[s,a]$ is the value for a given state-action pair and $T$ is the "temperature", or how randomly it should choose actions. A higher value of $T$ will lead the bot to be more exploratory, while a lower value of $T$ will cause the bot to always select the best action.
+
 We explored different values of $T$, both constant and changing over time.
 
 ![](images/differentGame-3x3_1-constDF_0.5-Boltz-constER_0.2-constLR_0.9-eval.png "")
@@ -220,9 +219,8 @@ _The above shows the training results for a 3x3 grid with 1 food, discount facto
 
 _The above shows the training results for a 3x3 grid with 1 food, discount factor of 0.5, learning rate of 0.9, and temperature of 0.2._
 
-### Play with learning rate
-####Constant vs decay
-To start exploring the effect of varying the learning rate we tested a variety of constant learning rates from .01 to 1. We found that for the 3 by 3 board with 1 food the optimal constant learning rate was .1. The results from this test are shown below.
+### Constant vs. Decaying Learning Rate
+To start exploring the effect of varying the learning rate we tested a variety of constant learning rates from .01 to 1. The learning rate is a neural network parameter that determines how quickly, or slowly, we adjust the learning rate. Higher learning rates adjust the weights faster, while lower learning rates adjust the weights more slowly. Adjusting the learning rate allows us to ensure that we are learning how to play games as quickly as possible, without overfitting to each new game. We found that for the 3 by 3 board with 1 food the optimal constant learning rate was .1. The results from this test are shown below.
 ![](images/differentGame-3x3_1-constDF_0.5-Boltz-constER_0.2-constLR_0.1-eval.png "")
 _The above shows the evaluation results for a 3x3 grid with 1 food, discount factor of 0.5, temperature of 0.2, and a learning rate of 0.1._
 
@@ -243,6 +241,24 @@ _The above shows the training results for a 3x3 grid with 3 food, discount facto
 
 ## Conclusions
 The Explorations we presetned above are some explorations we did when investigating how tweaking some of our reinforcement learning/neural network parameters. These explorations of the parameters we did tweak are by no means exhaustive, but they did help us to gain an intuition for how reinforcement learning and neural networks could be used together to teach a computer how to do something. Although our game, for most of our explorations, is relatively simple, this game could, given enough time, likely be extended fairly easily and make for an interesting path planning scenario. If we were to conintue working on this project, we would continue to do a more thurough sweep of all the parameters we explored above and perhaps transition to a more complicated game-space. 
+
+## Sources
+Here is a list of some of the sources we found very helpful as we were doing this project!
+
+* [“Reinforcement Learning: An Introduction", by Richard Sutton and Andrew Barto](https://webdocs.cs.ualberta.ca/~sutton/book/the-book.html)
+
+* [The Ogar Repository](https://github.com/OgarProject/Ogar)
+
+* [An implementation that uses TensorFlow (the neural network library we used) for reinforcement leargning)](https://github.com/nivwusquorum/tensorflow-deepq)
+
+* [A paper on Q-Learning with Neural Networks](http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=1526924)
+
+* [Another paper on Q-Learning with Neural Networks](https://www.cs.swarthmore.edu/~meeden/cs81/s12/papers/MarkStevePaper.pdf)
+
+* [A video explaining neural networks](https://www.youtube.com/watch?v=bH6VnezBZfI)
+
+* [Slides from a presentation about reinforcement learning and neural networks](http://web.mst.edu/~gosavia/neural_networks_RL.pdf)
+
 
 
 
