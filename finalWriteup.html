@@ -94,7 +94,7 @@ Each neuron takes in each of the outputs of the previous layer, multiplies them 
 
 Like other machine learning models, neural networks need to be trained. By comparing the outputs of the neural network to 'correct' results, the error can be minimized using an optimization technique such as gradient descent.
 
-Okay, now that we've got an understanding about neural networks, let's talk about how exactly we're using them in our reinforcement learning setup. In our case, the input to the neural network is the state of the game, and we have four outputs; one for each action. The outputs correspond to the predicted value of performing that action based on the current state. 
+Now that we've got an understanding about neural networks, let's talk about how exactly we're using them in our reinforcement learning setup. In our case, the input to the neural network is the state of the game, and we have four outputs; one for each action. The outputs correspond to the predicted value of performing that action based on the current state. 
 
 The information we're using to learn the Q function, in other words our training data, is a state and then a set of four values for each action. We collect, and update, this every time we make a move in our game. 
 
