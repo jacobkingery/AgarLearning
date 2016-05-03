@@ -31,7 +31,7 @@ For our final project for our data science course, we were interested in learnin
 
 ### What is Reinforcement Learning?
 
-In most of the machine learning we’ve done in this course up until now, we were trying to learn a model that would allow us to predict the correct output given a set of previously collected inputs. While this is great if you already have a lot of data collected, this wasn’t the case for us. Since we were trying to teach a computer how to do something, in our case play a game, we didn’t have a dataset readily collected. As a result, we had two options. First, we could collect a dataset of us, or other people, playing a game, and teach the computer how to play a game by learning how we played the game. Our other option, reinforcement learning, was to let a computer teach itself how to play a game by seeing which actions have positive results and which have negative consequences. For a more in-depth explanation of a simple implementation of an example of reinforcement learning, please take a look at our [first blog post!](http://jacobkingery.github.io/AgarLearning/blogPost1.html)
+In most of the machine learning we’ve done in this course up until now, we were trying to learn a model that would allow us to predict the correct output given a set of previously collected inputs. While this is great if you already have a lot of data collected, this wasn't the case for us. Since we were trying to teach a computer how to do something, in our case play a game, we didn't have a dataset readily collected. As a result, we had two options. First, we could collect a dataset of us, or other people, playing a game, and teach the computer how to play a game by learning how we played the game. Our other option, reinforcement learning, was to let a computer teach itself how to play a game by seeing which actions have positive results and which have negative consequences. For a more in-depth explanation of a simple implementation of an example of reinforcement learning, please take a look at our [first blog post!](http://jacobkingery.github.io/AgarLearning/blogPost1.html)
 
 #### Some Important Vocabulary
 
@@ -54,7 +54,7 @@ For this project, we started out trying to create a bot for the online game [aga
 
 **Reinforcement learning in a continuous space is difficult.** Since this game is played on pretty much a continuous area the state space is continuous, rather than being played on a grid. This means that there is a very large state space. What was more of a problem, though, was the action space was also continuous. In [agar.io](agar.io), players control their cells using the mouse, and the bot moves in the direction of the mouse. This means that in the case of our learning bot, an action would effectively be setting the mouse position of the "player" controlling the bot. A continuous action space is not something that is a solved problem in the reinforcement learning field, so we didn't think it was appropriately scoped project, for our first adventure with reinforcement learning.
 
-**It was hard to see whether the bot was getting better.**  Although we had started to implement some reinforcement learning algorithms, we found that we had a lot of trouble figuring out if the bot was learning, or whether the bot just happened to be getting lucky doing a random walk. (A random walk is the bot moving across the board in a random way.) Solving this problem was particularly difficult because the ogar implementation interfaces with the [agar.io](agar.io) frontend, so we would basically have had to build our own frontend to get around this lack of information about how well our bot was learning.  
+**It was hard to see whether the bot was getting better.**  Although we had started to implement some reinforcement learning algorithms, we found that we had a lot of trouble figuring out if the bot was learning, or whether the bot just happened to be getting lucky doing a random walk. (A random walk is the bot moving across the board in a random way.) Solving this problem was particularly difficult because the ogar implementation interfaces with the [agar.io](agar.io) front-end, so we would basically have had to build our own front-end to get around this lack of information about how well our bot was learning.  
 
 Although we could have certainly figured out ways to deal with these challenges, we were more interested in exploring how reinforcement learning and neural networks can be used together than we were in solving the particular problem of building the world's best [agar.io](agar.io) bot. As a result, we decided to simplify our game a little.
 
@@ -113,6 +113,20 @@ To combine the game, our reinforcement learning algorithm, and the neural networ
 ![](images/System_Diagram.jpg "")
 
 In this system diagram, we have color coded where in our code each part happens. The left-most column are all the steps that we go through in our main loop. For steps with additional rectangles to the right, these rectangles provide more information based on how we're going about performing those steps. 
+
+When we run our main loop, we first initialize our reinforcement learning and neural network objects. Then we initialize our game. 
+
+Next we get the action we should perform from the reinforcement learning algorithm given our game state. This is done by getting all the expected values of each action given the stat from our neural network. Then, the reinforcement learning algorithm picks and action. In some cases, this will be the best action with the highest predicted value, but in other cases, we might be exploratory and choose an action that we don't believe is quite as valuable to see what happens. 
+
+After we perform the action, we see what the reward of performing that action was. 
+
+Next we store the state action reward and new state tuple. Using our reinforcement learning algorithm, we convert this into a state, action, value, retard, new state, new action, predicted value tuple, and store this. 
+
+Finally we train the reinforcement learning algorithm, by updating the value of our state using the following equation that we described in the reinforcement learning section:
+
+$$Q_{t+1}(s_t,a_t) = Q_t(s_t, a_t) + \alpha_t(s_t,a_t)\times (R_{t+1} + \gamma \times max(Q_t(s_t+1,a)) - Q_t(s_t, a_t))$$
+
+Then, we pass this value into our neural net as another example of what the value function ought to output and train the neural network again. 
 
 *To see how we've actually written the code to perform each of these steps, please consult GridLearning/mainLoop.py, GridLearning/game.py, GridLearning/rl.py, or GridLearning/nn.py.*
 
